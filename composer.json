@@ -1,0 +1,55 @@
+{
+    "name": "mellivora/logger",
+    "type": "library",
+    "description": "Logger component of mellivora framework",
+    "keywords": [
+        "framework",
+        "mellivora",
+        "claw",
+        "logger",
+        "logger-factory",
+        "monolog",
+        "psr-log"
+    ],
+    "homepage": "https://github.com/zhouyl/mellivora-logger-factory",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "zhouyl",
+            "email": "81438567@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0",
+        "monolog/monolog": "^1.23",
+        "psr/log": "~1.0"
+    },
+    "require-dev": {
+        "swiftmailer/swiftmailer": "^6.1",
+        "friendsofphp/php-cs-fixer": "~2",
+        "phpunit/phpunit": "~5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mellivora\\Logger\\": "src"
+        },
+        "files": []
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests"
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "secure-http": false
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit; ./vendor/bin/php-cs-fixer fix -v --diff --dry-run;",
+        "phpunit": "./vendor/bin/phpunit;",
+        "phpcs": "./vendor/bin/php-cs-fixer fix -v --diff --dry-run;",
+        "phpcs-fix": "./vendor/bin/php-cs-fixer fix -v --diff;"
+    }
+}
