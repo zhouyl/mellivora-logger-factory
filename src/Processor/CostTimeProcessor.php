@@ -17,9 +17,9 @@ class CostTimeProcessor
             self::$points[$name] = microtime(true);
             $cost                = 0.0;
         } else {
-            $current                 = microtime(true);
-            $cost                    = round($current - self::$points[$name], 8);
-            self::$points[$name]     = $current;
+            $current             = microtime(true);
+            $cost                = round($current - self::$points[$name], 8);
+            self::$points[$name] = $current;
         }
 
         $record['extra']['cost'] = $cost.' s';

@@ -2,7 +2,6 @@
 
 namespace Mellivora\Logger;
 
-use Mellivora\Logger\Filter\FilterInterFace;
 use Monolog\Logger as MonoLogger;
 
 /**
@@ -67,7 +66,11 @@ class Logger extends MonoLogger
     public function pushFilter($callback)
     {
         if (! is_callable($callback)) {
-            throw new \InvalidArgumentException('Filters must be valid callables (callback or object with an __invoke method), '.var_export($callback, true).' given');
+            throw new \InvalidArgumentException(
+                'Filters must be valid callables '.
+                '(callback or object with an __invoke method), '.
+                var_export($callback, true).' given'
+            );
         }
 
         array_unshift($this->filters, $callback);
@@ -90,7 +93,7 @@ class Logger extends MonoLogger
     }
 
     /**
-     * @return FilterInterFace[]
+     * @return callable[]
      */
     public function getFilters()
     {
@@ -98,12 +101,11 @@ class Logger extends MonoLogger
     }
 
     /**
-     * @param $level
-     * @param $message
-     * @param array $context
+     * {@inheritdoc}
      */
     public function addRecord($level, $message, array $context = [])
     {
+        // 增加过滤器的调用
         foreach ($this->filters as $filter) {
             if (! $filter($level, $message, $context)) {
                 return false;
@@ -114,7 +116,7 @@ class Logger extends MonoLogger
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function __toString()
     {
