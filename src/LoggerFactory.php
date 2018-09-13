@@ -174,7 +174,7 @@ class LoggerFactory implements \ArrayAccess
      *
      * @return \Mellivora\Logger\LoggerFactory
      */
-    public function releaseAll()
+    public function refresh()
     {
         $this->loggers = [];
 

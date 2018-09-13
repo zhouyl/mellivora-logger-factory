@@ -36,25 +36,32 @@ class SMTPHandler extends AbstractProcessingHandler
     protected $maxRecords = 10;
 
     /**
-     * @param string       $sender     发件人地址
-     * @param array|string $receivers  收件人地址或列表
-     * @param string       $subject    邮件主题
-     * @param string       $host       SMTP邮件服务器
-     * @param int          $port       SMTP端口
-     * @param null|string  $username   SMTP认证用户名
-     * @param null|string  $password   SMTP认证密码
-     * @param int          $maxRecords 最大消息数量限制
-     * @param string       $level
+     * 服务器认证参数
+     *
+     * @var array
+     */
+    protected $certificates = [
+        'host'       => '127.0.0.1', // SMTP邮件服务器
+        'port'       => 25, // SMTP端口
+        'username'   => null, // SMTP认证用户名
+        'password'   => null, // SMTP认证密码
+    ];
+
+    /**
+     * @param string       $sender       发件人地址
+     * @param array|string $receivers    收件人地址或列表
+     * @param string       $subject      邮件主题
+     * @param array        $certificates 服务器认证参数
+     * @param int          $maxRecords
+     * @param int          $level
      * @param bool         $bubble
+     * @param mixed        $maxRecords
      */
     public function __construct(
         $sender,
         $receivers,
         $subject,
-        $host = '127.0.0.1',
-        $port = 25,
-        $username = null,
-        $password = null,
+        array $certificates = [],
         $maxRecords = 10,
         $level = Logger::ERROR,
         $bubble = true
@@ -65,27 +72,26 @@ class SMTPHandler extends AbstractProcessingHandler
 
         parent::__construct($level, $bubble);
 
-        // 创建 transport
-        $transport = \Swift_SmtpTransport::newInstance($host, $port);
+        // 合并默认选项
+        $certificates += $this->certificates;
 
-        if (! empty($username)) {
-            $transport->setUsername($username)->setPassword($password);
+        // 创建 transport
+        $transport = \Swift_SmtpTransport::newInstance($certificates['host'], $certificates['port']);
+
+        if (! empty($certificates['username'])) {
+            $transport->setUsername($certificates['username'])->setPassword($certificates['password']);
         }
 
         // 发件人地址
         list($fromaddr, $fromname) = $this->parseAddress($sender);
-
-        // 收件人地址
-        if (! is_array($receivers)) {
-            $receivers = [$receivers];
-        }
 
         // 创建邮件消息
         $message = \Swift_Message::newInstance($subject, null, 'text/plain', 'utf-8')
             ->setDate(time())
             ->setFrom($fromaddr, $fromname);
 
-        foreach ($receivers as $receiver) {
+        // 设置收件人地址
+        foreach ((array) $receivers as $receiver) {
             list($addr, $name) = $this->parseAddress($receiver);
             $message->addTo($addr, $name);
         }
@@ -99,8 +105,8 @@ class SMTPHandler extends AbstractProcessingHandler
      * 解析邮件地址，支持对以下格式进行正确解析
      * 解析结果将返回一个数组，内容分别为 [邮件地址，发/收件人名称]
      *
-     * - zhouyl <zhouyonglong@Mellivora.com>
-     * - zhouyonglong@Mellivora.com
+     * - name <my@mailhost.com>
+     * - my@mailhost.com
      *
      * @param string $address
      *
@@ -110,7 +116,7 @@ class SMTPHandler extends AbstractProcessingHandler
      */
     protected function parseAddress($address)
     {
-        // 识别 "zhouyl <zhouyonglong@Mellivora.com>" 类似的格式
+        // 识别 "name <my@mailhost.com>" 类似的格式
         preg_match('/^(.+)<([a-z][\w\.\-]+@[\w\-]+(\.\w+)+)>$/i', $address, $matches);
 
         if (count($matches) === 4) {

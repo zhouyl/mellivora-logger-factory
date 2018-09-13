@@ -14,7 +14,8 @@ composer.lock
 *.log
 *.bak
 
-_notes
-node_modules
-vendor
-examples
+/_notes
+/node_modules
+/vendor
+/examples
+/config

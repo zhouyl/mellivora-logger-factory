@@ -15,6 +15,35 @@ class Logger extends MonoLogger
     protected $filters = [];
 
     /**
+     * @var int
+     */
+    protected $level = Logger::DEBUG;
+
+    /**
+     * 设置一个针对当前 logger 的全局 level，低于这个 level 的日志将不被传递到 handler
+     *
+     * @param int|string $level Level or level name
+     *
+     * @return self
+     */
+    public function setLevel($level)
+    {
+        $this->level = Logger::toMonologLevel($level);
+
+        return $this;
+    }
+
+    /**
+     * 获取当前 logger 的 level
+     *
+     * @return int
+     */
+    public function getLevel()
+    {
+        return $this->level;
+    }
+
+    /**
      * 根据 class 名称获取 handler
      * (如果有多个同一实例的 handler，将根据顺序返回其它一个)
      *
@@ -57,7 +86,7 @@ class Logger extends MonoLogger
     }
 
     /**
-     * Pushes a filter on to the stack.
+     * 新增一个过滤器 filter
      *
      * @param callable $callback
      *
@@ -79,7 +108,7 @@ class Logger extends MonoLogger
     }
 
     /**
-     * Pops a filter from the stack
+     * 弹出并获取第一个注册的过滤器
      *
      * @return callable
      */
@@ -93,6 +122,8 @@ class Logger extends MonoLogger
     }
 
     /**
+     * 获取所有的过滤器
+     *
      * @return callable[]
      */
     public function getFilters()
@@ -105,6 +136,10 @@ class Logger extends MonoLogger
      */
     public function addRecord($level, $message, array $context = [])
     {
+        if ($record['level'] < $this->level) {
+            return false;
+        }
+
         // 增加过滤器的调用
         foreach ($this->filters as $filter) {
             if (! $filter($level, $message, $context)) {
