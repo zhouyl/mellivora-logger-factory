@@ -1,0 +1,121 @@
+{
+    "formatters": {
+        "simple": {
+            "class": "Monolog\\Formatter\\LineFormatter",
+            "params": {
+                "format": "[%datetime%][%level_name%] %message% %context%\n"
+            }
+        },
+        "venbose": {
+            "class": "Monolog\\Formatter\\LineFormatter",
+            "params": {
+                "format": "[%datetime%][%channel%][%level_name%] %message% %context% %extra%\n"
+            }
+        },
+        "json": {
+            "class": "Monolog\\Formatter\\JsonFormatter"
+        }
+    },
+    "processors": {
+        "intro": {
+            "class": "Monolog\\Processor\\IntrospectionProcessor",
+            "params": {
+                "level": "ERROR",
+                "skipStackFramesCount": 2
+            }
+        },
+        "web": {
+            "class": "Mellivora\\Logger\\Processor\\WebProcessor",
+            "params": {
+                "level": "ERROR"
+            }
+        },
+        "script": {
+            "class": "Mellivora\\Logger\\Processor\\ScriptProcessor",
+            "params": {
+                "level": "ERROR"
+            }
+        },
+        "profiler": {
+            "class": "Mellivora\\Logger\\Processor\\ProfilerProcessor",
+            "params": {
+                "level": "DEBUG"
+            }
+        }
+    },
+    "handlers": {
+        "file": {
+            "class": "Mellivora\\Logger\\Handler\\NamedRotatingFileHandler",
+            "params": {
+                "filename": "logs/%channel%.log",
+                "maxBytes": 100000000,
+                "backupCount": 10,
+                "bufferSize": 10,
+                "level": "INFO"
+            },
+            "formatter": "json",
+            "processors": [
+                "intro",
+                "web",
+                "script",
+                "profiler"
+            ]
+        },
+        "cli": {
+            "class": "Monolog\\Handler\\StreamHandler",
+            "params": {
+                "stream": "php://stdout",
+                "level": "DEBUG"
+            },
+            "formatter": "simple",
+            "processors": [
+                "intro",
+                "web",
+                "script",
+                "profiler"
+            ]
+        },
+        "mail": {
+            "class": "Mellivora\\Logger\\Handler\\SmtpHandler",
+            "params": {
+                "sender": "logger-factory <oa@jrq.com>",
+                "receivers": [
+                    "zhouyl <zhouyonglong@globalegrow.com>"
+                ],
+                "subject": "[ERROR] FROM Logger-Factory",
+                "certificates": {
+                    "host": "smtp.exmail.qq.com",
+                    "port": 25,
+                    "username": "oa@jrq.com",
+                    "password": "rRy-7tT-Jq8-mJ6"
+                },
+                "maxRecords": 10,
+                "level": "CRITICAL"
+            },
+            "formatter": "venbose",
+            "processors": [
+                "intro",
+                "web",
+                "script",
+                "profiler"
+            ]
+        }
+    },
+    "loggers": {
+        "default": [
+            "cli",
+            "file",
+            "mail"
+        ],
+        "cli": [
+            "cli",
+            "file",
+            "mail"
+        ],
+        "exception": [
+            "cli",
+            "file",
+            "mail"
+        ]
+    }
+}

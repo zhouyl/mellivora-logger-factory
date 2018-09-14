@@ -177,7 +177,7 @@ class LoggerFactory implements \ArrayAccess
      *
      * @return \Mellivora\Logger\LoggerFactory
      */
-    public function addLogger($channel, Logger $logger)
+    public function add($channel, Logger $logger)
     {
         $this->instances[$channel] = $logger;
 
@@ -199,20 +199,14 @@ class LoggerFactory implements \ArrayAccess
             $channel = $default;
         }
 
-        if (! isset($this->loggers[$default])) {
-            $this->loggers[$default] = $this->make($default);
+        if (! isset($this->instances[$channel])) {
+            $this->instances[$channel] = $this->make(
+                $channel,
+                $this->loggers[$channel] ? $this->loggers[$channel] : []
+            );
         }
 
-        if (isset($this->instances[$channel])) {
-            return $this->instances[$channel];
-        }
-
-        $this->loggers[$channel] = $this->make(
-            $channel,
-            $this->loggers[$channel] ? $this->loggers[$channel] : ['null']
-        );
-
-        return $this->loggers[$channel];
+        return $this->instances[$channel];
     }
 
     /**
@@ -295,7 +289,7 @@ class LoggerFactory implements \ArrayAccess
      */
     public function offsetSet($channel, $logger)
     {
-        return $this->addLogger($channel, $logger);
+        return $this->add($channel, $logger);
     }
 
     /**

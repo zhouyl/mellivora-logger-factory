@@ -1,0 +1,99 @@
+# formatters - 用于最终输出日志消息的格式
+formatters:
+
+  # 简单消息输出
+  simple:
+    class: Monolog\Formatter\LineFormatter
+    params:
+      format: "[%datetime%][%level_name%] %message% %context%\n"
+
+  # 输出消息详情
+  venbose:
+    class: Monolog\Formatter\LineFormatter
+    params:
+      format: "[%datetime%][%channel%][%level_name%] %message% %context% %extra%\n"
+
+  # JSON 格式输出，便于 ELK 收集
+  json:
+    class: Monolog\Formatter\JsonFormatter
+
+# processors - 注册的 processor 将会附加在消息的 extra 字段中
+processors:
+  # 用于日志输出所在 的 file, line, class, method, ...
+  intro:
+    class: Monolog\Processor\IntrospectionProcessor
+    params:
+      level: ERROR
+      skipStackFramesCount: 2
+
+  # 用于捕获 http web 请求头信息
+  web:
+    class: Mellivora\Logger\Processor\WebProcessor
+    params:
+      level: ERROR
+
+  # 用于捕获脚本运行信息
+  script:
+    class: Mellivora\Logger\Processor\ScriptProcessor
+    params:
+      level: ERROR
+
+  # 用于性能分析
+  profiler:
+    class: Mellivora\Logger\Processor\ProfilerProcessor
+    params:
+      level: DEBUG
+
+# handlers - 通过拼装 formatter/processor，用于日志输出方式的设定
+handlers:
+
+  # 文件输出，使用 JSON 格式，方便 ELK 收集
+  file:
+    class: Mellivora\Logger\Handler\NamedRotatingFileHandler
+    params:
+      filename: "logs/%channel%.log"
+      maxBytes: 100000000 # 100Mb，文件最大尺寸
+      backupCount: 10 # 文件保留数量
+      bufferSize: 10 # 缓冲区大小(日志数量)
+      level: INFO
+    formatter: json
+    processors: [intro, web, script, profiler]
+
+  # 命令行模式，输出简单日志内容
+  cli:
+    class: Monolog\Handler\StreamHandler
+    params:
+      stream: php://stdout
+      level: DEBUG
+    formatter: simple
+    processors: [intro, web, script, profiler]
+
+  # 邮件预警，仅报告致命错误 CRITICAL
+  mail:
+    class: Mellivora\Logger\Handler\SmtpHandler
+    params:
+      sender: logger-factory <oa@jrq.com>
+      receivers:
+        - zhouyl <zhouyonglong@globalegrow.com>
+      subject: "[ERROR] FROM Logger-Factory"
+      certificates:
+        host: smtp.exmail.qq.com
+        port: 25
+        username: oa@jrq.com
+        password: rRy-7tT-Jq8-mJ6
+      maxRecords: 10
+      level: CRITICAL
+    formatter: venbose
+    processors: [intro, web, script, profiler]
+
+# loggers -  当声明的 logger 不在以下列表中时，默认为 default
+loggers:
+
+  # 默认日志
+  default: [cli, file, mail]
+
+  # 命令行模式
+  cli: [cli, file, mail]
+
+  # 异常处理
+  exception: [cli, file, mail]

@@ -1,11 +1,10 @@
 {
-    "name": "mellivora/logger",
+    "name": "mellivora/logger-factory",
     "type": "library",
-    "description": "Logger component of mellivora framework",
+    "description": "Logger factory component of mellivora framework",
     "keywords": [
         "framework",
         "mellivora",
-        "claw",
         "logger",
         "logger-factory",
         "monolog",
@@ -26,7 +25,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "~2",
-        "hassankhan/config": "^1.0",
+        "hassankhan/config": "~1.0",
         "phpunit/phpunit": "~5.0",
         "swiftmailer/swiftmailer": "~6.1",
         "symfony/yaml": "~3.4"
