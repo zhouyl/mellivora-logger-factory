@@ -55,6 +55,8 @@ class SmtpHandler extends AbstractProcessingHandler
      * @param int          $maxRecords
      * @param int          $level
      * @param bool         $bubble
+     *
+     * @throws \Exception
      */
     public function __construct(
         $sender,
@@ -66,7 +68,9 @@ class SmtpHandler extends AbstractProcessingHandler
         $bubble = true
     ) {
         if (! class_exists('\Swift_Mailer')) {
-            throw new \Exception('Require components: Swift_Mailer (ref: http://swiftmailer.org/)');
+            throw new \Exception(
+                'Require components: Swift_Mailer (ref: http://swiftmailer.org/)'
+            );
         }
 
         parent::__construct($level, $bubble);
@@ -75,10 +79,14 @@ class SmtpHandler extends AbstractProcessingHandler
         $certificates += $this->certificates;
 
         // 创建 transport
-        $transport = new \Swift_SmtpTransport($certificates['host'], $certificates['port']);
+        $transport = new \Swift_SmtpTransport(
+            $certificates['host'],
+            $certificates['port']
+        );
 
         if (! empty($certificates['username'])) {
-            $transport->setUsername($certificates['username'])->setPassword($certificates['password']);
+            $transport->setUsername($certificates['username'])
+                ->setPassword($certificates['password']);
         }
 
         // 发件人地址
@@ -167,7 +175,9 @@ class SmtpHandler extends AbstractProcessingHandler
     protected function send()
     {
         if (! empty($this->records)) {
-            $this->message->setBody((string) $this->getFormatter()->formatBatch($this->records));
+            $this->message->setBody(
+                (string) $this->getFormatter()->formatBatch($this->records)
+            );
             $this->mailer->send($this->message);
         }
 

@@ -68,6 +68,13 @@ class LoggerFactory implements \ArrayAccess
      */
     public static function buildWith($configFile)
     {
+        if (! class_exists(Config::class)) {
+            throw new \Exception(
+                'Require components: hassankhan/config ' .
+                '(ref: https://github.com/hassankhan/config)'
+            );
+        }
+
         return self::build(Config::load($configFile)->all());
     }
 
@@ -113,6 +120,9 @@ class LoggerFactory implements \ArrayAccess
      */
     protected $instnaces  = [];
 
+    /**
+     * @param array $config
+     */
     public function __construct(array $config)
     {
         $keys = ['formatters', 'processors',  'handlers', 'loggers'];
@@ -128,12 +138,16 @@ class LoggerFactory implements \ArrayAccess
      *
      * @param string $default
      *
+     * @throws \RuntimeException
+     *
      * @return $this
      */
     public function setDefault($default)
     {
         if (! isset($this->loggers[$default])) {
-            throw new \RuntimeException("Call to undefined logger channel '$default'");
+            throw new \RuntimeException(
+                "Call to undefined logger channel '$default'"
+            );
         }
 
         $this->default = $default;
@@ -288,8 +302,6 @@ class LoggerFactory implements \ArrayAccess
      * 根据名称获取 logger
      *
      * @param string $channel
-     *
-     * @throws \RuntimeException
      *
      * @return \Mellivora\Logger\Logger
      */

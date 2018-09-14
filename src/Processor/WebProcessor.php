@@ -24,8 +24,12 @@ class WebProcessor
 
     protected $postData = [];
 
-    public function __construct($level = Logger::DEBUG, array $serverKeys = null, array $serverData = null, array $postData = null)
-    {
+    public function __construct(
+        $level = Logger::DEBUG,
+        array $serverKeys = null,
+        array $serverData = null,
+        array $postData = null
+    ) {
         $this->level      = Logger::toMonologLevel($level);
         $this->serverData = $serverData ?: $_SERVER;
         $this->postData   = $postData ?: $_POST;

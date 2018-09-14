@@ -71,7 +71,7 @@ class NamedRotatingFileHandler extends StreamHandler
      *
      * @param mixed $channel
      *
-     * @throws \Exception
+     * @throws \UnexpectedValueException
      *
      * @return string
      */
@@ -85,7 +85,9 @@ class NamedRotatingFileHandler extends StreamHandler
             }
 
             if (! is_writable($logPath)) {
-                throw new \UnexpectedValueException('Unable to write to the log path: ' . $logPath);
+                throw new \UnexpectedValueException(
+                    'Unable to write to the log path: ' . $logPath
+                );
             }
 
             $this->dirCreated = true;
@@ -175,8 +177,7 @@ class NamedRotatingFileHandler extends StreamHandler
     }
 
     /**
-     * 日志分片备份
-     * 仅保留指定数量
+     * 日志分片备份，仅保留指定数量
      */
     protected function rotate()
     {

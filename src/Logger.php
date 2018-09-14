@@ -90,6 +90,8 @@ class Logger extends MonoLogger
      *
      * @param callable $callback
      *
+     * @throws \InvalidArgumentException
+     *
      * @return $this
      */
     public function pushFilter($callback)
@@ -109,6 +111,8 @@ class Logger extends MonoLogger
 
     /**
      * 弹出并获取第一个注册的过滤器
+     *
+     * @throws \LogicException
      *
      * @return callable
      */
