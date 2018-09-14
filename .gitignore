@@ -19,3 +19,4 @@ composer.lock
 /vendor
 /examples
 /config
+/logs

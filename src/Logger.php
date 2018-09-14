@@ -96,9 +96,9 @@ class Logger extends MonoLogger
     {
         if (! is_callable($callback)) {
             throw new \InvalidArgumentException(
-                'Filters must be valid callables '.
-                '(callback or object with an __invoke method), '.
-                var_export($callback, true).' given'
+                'Filters must be valid callables ' .
+                '(callback or object with an __invoke method), ' .
+                var_export($callback, true) . ' given'
             );
         }
 
@@ -136,7 +136,7 @@ class Logger extends MonoLogger
      */
     public function addRecord($level, $message, array $context = [])
     {
-        if ($record['level'] < $this->level) {
+        if ($level < $this->level) {
             return false;
         }
 

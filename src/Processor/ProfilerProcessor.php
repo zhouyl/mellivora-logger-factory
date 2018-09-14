@@ -2,6 +2,7 @@
 
 namespace Mellivora\Logger\Processor;
 
+use Monolog\Logger;
 use Monolog\Processor\MemoryProcessor;
 
 /**
@@ -11,8 +12,20 @@ class ProfilerProcessor extends MemoryProcessor
 {
     protected static $points = [];
 
+    protected $level;
+
+    public function __construct($level = Logger::DEBUG)
+    {
+        $this->level = Logger::toMonologLevel($level);
+        parent::__construct(true, true);
+    }
+
     public function __invoke(array $record)
     {
+        if ($record['level'] < $this->level) {
+            return $record;
+        }
+
         $name = $record['channel'];
 
         if (! isset(self::$points[$name])) {
@@ -20,13 +33,13 @@ class ProfilerProcessor extends MemoryProcessor
             $cost                = 0.0;
         } else {
             $current             = microtime(true);
-            $cost                = round($current - self::$points[$name], 8);
+            $cost                = round($current - self::$points[$name], 6);
             self::$points[$name] = $current;
         }
 
-        $record['extra']['cost']              = $cost.' s';
-        $record['extra']['memory_usage']      = $this->formatBytes(memory_get_usage($this->realUsage));
-        $record['extra']['memory_peak_usage'] = $this->formatBytes(memory_get_peak_usage($this->realUsage));
+        $record['extra']['cost']               = $cost;
+        $record['extra']['memory_usage']       = $this->formatBytes(memory_get_usage($this->realUsage));
+        $record['extra']['memory_peak_usage']  = $this->formatBytes(memory_get_peak_usage($this->realUsage));
 
         return $record;
     }

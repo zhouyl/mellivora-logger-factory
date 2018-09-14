@@ -2,13 +2,75 @@
 
 namespace Mellivora\Logger;
 
-use Monolog\Handler\NullHandler;
+use Noodlehaus\Config;
 
 /**
  * 日志工厂类 -  通过参数配置来管理项目的日志
  */
 class LoggerFactory implements \ArrayAccess
 {
+    /**
+     * 用于来辅助日志文件定位项目根目录
+     *
+     * @var string
+     */
+    protected static $rootPath = null;
+
+    /**
+     * 设置项目根目录
+     *
+     * @param string $path
+     */
+    public static function setRootPath($path)
+    {
+        self::$rootPath = realpath($path);
+    }
+
+    /**
+     * 获取项目根目录
+     *
+     * @return string
+     */
+    public static function getRootPath()
+    {
+        if (! self::$rootPath) {
+            foreach (['.', '../../..'] as $p) {
+                $path = realpath(dirname(__DIR__) . '/' . $p);
+                if (is_dir($path) && is_dir($path . '/vendor')) {
+                    self::setRootPath($path);
+                }
+            }
+        }
+
+        return self::$rootPath;
+    }
+
+    /**
+     * 根据配置，实例化创建一个 logger factory
+     *
+     * @param array $config
+     *
+     * @return \Mellivora\Logger\LoggerFactory
+     */
+    public static function build(array $config)
+    {
+        return new self($config);
+    }
+
+    /**
+     * 根据配置文件，实例化创建一个 logger factory
+     * 需要 Noodlehaus\Config 开源组件的支持
+     * 可支持的文件类型包括 php/yaml/json/ini/xml 格式
+     *
+     * @param string $configFile
+     *
+     * @return \Mellivora\Logger\LoggerFactory
+     */
+    public static function buildWith($configFile)
+    {
+        return self::build(Config::load($configFile)->all());
+    }
+
     /**
      * 默认 logger channel
      *
@@ -17,55 +79,48 @@ class LoggerFactory implements \ArrayAccess
     protected $default = 'default';
 
     /**
-     * 已注册的 logger channel
-     *
-     * @var Logger[]
-     */
-    protected $loggers = [];
-
-    /**
-     * 配置数据，参考 examples/config.yaml 文件
+     * 定义了 logger formatter 配置选项
      *
      * @var array
      */
-    public static $config = [];
+    protected $formatters = [];
 
     /**
-     * 单例实例
+     * 定义了 logger processor 配置选项
      *
-     * @return LoggerFactory
+     * @var array
      */
-    protected static $instance = null;
+    protected $processors = [];
 
     /**
-     * 注册 logger 配置项
+     * 定义了 logger handler 配置选项
      *
-     * @param array $config
+     * @var array
      */
-    public static function setupWithConfig(array $config)
+    protected $handlers   = [];
+
+    /**
+     * 定义了所有的 logger channel
+     *
+     * @var array
+     */
+    protected $loggers    = [];
+
+    /**
+     * 已实例化的 logger
+     *
+     * @var array
+     */
+    protected $instnaces  = [];
+
+    public function __construct(array $config)
     {
-        self::$config = array_merge(self::$config, $config);
-    }
-
-    /**
-     * 获取单例模式
-     *
-     * @return \Mellivora\Logger\LoggerFactory
-     */
-    public static function getInstance()
-    {
-        if (self::$instance === null) {
-            self::$instance = new self;
+        $keys = ['formatters', 'processors',  'handlers', 'loggers'];
+        foreach ($keys as $key) {
+            if (isset($config[$key]) && is_array($config[$key])) {
+                $this->{$key} = $config[$key];
+            }
         }
-
-        return self::$instance;
-    }
-
-    /**
-     * 禁止 clone
-     */
-    private function __clone()
-    {
     }
 
     /**
@@ -77,7 +132,7 @@ class LoggerFactory implements \ArrayAccess
      */
     public function setDefault($default)
     {
-        if (! isset(self::$config[$default])) {
+        if (! isset($this->loggers[$default])) {
             throw new \RuntimeException("Call to undefined logger channel '$default'");
         }
 
@@ -87,17 +142,21 @@ class LoggerFactory implements \ArrayAccess
     }
 
     /**
-     * 获取默认 logger 实例
+     * 获取默认 logger 名称
      *
      * @return \Mellivora\Logger\Logger
      */
     public function getDefault()
     {
-        return $this->get($this->default);
+        if (empty($this->default)) {
+            $this->default = current(array_keys($this->loggers));
+        }
+
+        return $this->default;
     }
 
     /**
-     * 注册 logger
+     * 注册一个 logger 实例
      *
      * @param string                   $channel
      * @param \Mellivora\Logger\Logger $logger
@@ -106,83 +165,90 @@ class LoggerFactory implements \ArrayAccess
      */
     public function addLogger($channel, Logger $logger)
     {
-        $this->loggers[$channel] = $logger;
+        $this->instances[$channel] = $logger;
 
         return $this;
     }
 
     /**
-     * 根据名称获取 logger
+     * 根据名称及预定义配置，获取一个 logger
      *
      * @param string $channel
      *
      * @return \Mellivora\Logger\Logger
      */
-    public function getLogger($channel = null)
+    public function get($channel = null)
     {
-        if ($channel === null) {
-            $channel = $this->default;
+        $default = $this->getDefault();
+
+        if (empty($channel) || ! isset($this->loggers[$channel])) {
+            $channel = $default;
         }
 
-        // 如果 logger 已注册，直接返回
-        if (array_key_exists($channel, $this->loggers)) {
-            return $this->loggers[$channel];
+        if (! isset($this->loggers[$default])) {
+            $this->loggers[$default] = $this->make($default);
         }
 
-        // 根据配置文件，创建 logger 实例并注册
-        if (isset(self::$config[$channel])) {
-            $logger = new Logger($channel);
-
-            $options = self::$config[$channel];
-
-            if (isset($options['handlers'])) {
-                $this->initLoggerHandlers($logger, $options['handlers']);
-            }
-
-            if (isset($options['processors'])) {
-                $this->initLoggerProcessors($logger, $options['processors']);
-            }
-
-            if (isset($options['filters'])) {
-                $this->initLoggerFilters($logger, $options['filters']);
-            }
-            $this->loggers[$channel] = $logger;
-
-            return $logger;
+        if (isset($this->instances[$channel])) {
+            return $this->instances[$channel];
         }
 
-        // 未指定 default 配置，创建一个 NullHandler 的默认 logger
-        if ($channel === $this->default) {
-            $logger = new Logger($channel);
-            $logger->pushHandler(new NullHandler);
-            $this->loggers[$channel] = $logger;
+        $this->loggers[$channel] = $this->make(
+            $channel,
+            $this->loggers[$channel] ? $this->loggers[$channel] : ['null']
+        );
 
-            return $logger;
-        }
-
-        if ($channel === $this->default) {
-            throw new \RuntimeException('The default logger not specified');
-        }
-
-        // 未指定配置的 logger，通过 clone 的方式，来根据 default 创建一个新的 logger
-        // 以便于不同应用间的 logger 可以进行独立设置而不会冲突
-        return $this->get($this->default)->withName($channel);
+        return $this->loggers[$channel];
     }
 
     /**
-     * 释放已注册的 logger，以刷新 logger
+     * 根据已注册的 handlers 配置，即时生成一个 logger
      *
-     * @return \Mellivora\Logger\LoggerFactory
+     * @param string            $channel
+     * @param null|array|string $handlers
+     *
+     * @return \Mellivora\Logger\Logger
      */
-    public function refresh()
+    public function make($channel, $handlers=null)
     {
-        $this->loggers = [];
+        $logger = new Logger($channel);
 
-        return $this;
+        if (empty($handlers)) {
+            return $logger->pushHandler(new NullHandler);
+        }
+
+        foreach (is_array($handlers) ? $handlers : [] as $handlerName) {
+            if (! isset($this->handlers[$handlerName])) {
+                continue;
+            }
+
+            $option  = $this->handlers[$handlerName];
+            $handler = $this->newInstanceWithOption($option);
+
+            if (isset($option['processors'])) {
+                foreach ($option['processors'] as $processorName) {
+                    if (isset($this->processors[$processorName])) {
+                        $handler->pushProcessor(
+                            $this->newInstanceWithOption($this->processors[$processorName])
+                        );
+                    }
+                }
+            }
+
+            if (isset($option['formatter'], $this->formatters[$option['formatter']])) {
+                $handler->setFormatter(
+                    $this->newInstanceWithOption($this->formatters[$option['formatter']])
+                );
+            }
+
+            $logger->pushHandler($handler);
+        }
+
+        return $logger;
     }
 
     /**
-     * 判断指定名称的 logger 是否存在
+     * 判断指定的 logger channel 是否存在
      *
      * @param string $channel
      *
@@ -190,138 +256,30 @@ class LoggerFactory implements \ArrayAccess
      */
     public function exists($channel)
     {
-        return isset(self::$config[$channel]);
+        return isset(self::$loggers[$channel]);
     }
 
     /**
-     * 根据选项参数，创建类实例
+     * 释放已注册的 logger，以刷新 logger
      *
-     *  option 需要以下参数：
-     *      class:    用于指定完整的类名（包含 namespace 部分）
-     *      argments: 用于指定参数列表，使用 key-value 对应类的构造方法参数列表
-     *
-     *  例如：
-     *      $logger = $this->newInstanceWithOption([
-     *          'class' => '\Mellivora\Logger\Logger',
-     *          'argments' => ['name' => 'myname'],
-     *      ]);
-     *
-     * 相当于： $logger = new \Mellivora\Logger\Logger('myname');
-     *
-     * @param array $option
-     *
-     * @throws \Exception
-     *
-     * @return object
+     * @return \Mellivora\Logger\LoggerFactory
      */
-    protected function newInstanceWithOption($option)
+    public function release()
     {
-        if (empty($option['class'])) {
-            throw new \InvalidArgumentException("Missing the 'class' argments");
-        }
+        $this->instances = [];
 
-        $class = $option['class'];
-        if (! class_exists($class)) {
-            throw new \RuntimeException("Class '$class' not found");
-        }
-
-        $argments = empty($option['argments']) ? null : $option['argments'];
-        if (empty($argments)) {
-            return new $class;
-        }
-
-        $class = new \ReflectionClass($class);
-
-        $data = [];
-        foreach ($class->getConstructor()->getParameters() as $p) {
-            $data[$p->getName()] = $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null;
-        }
-
-        return $class->newInstanceArgs(array_merge($data, $argments));
+        return $this;
     }
 
     /**
-     * @param \Mellivora\Logger\Logger $logger
-     * @param array                    $handlers
-     */
-    protected function initLoggerHandlers(Logger $logger, array $handlers)
-    {
-        foreach ($handlers as $option) {
-            $handler = $this->newInstanceWithOption($option);
-
-            if (isset($option['processors'])) {
-                foreach ($option['processors'] as $opt) {
-                    $handler->pushProcessor($this->newInstanceWithOption($opt));
-                }
-            }
-
-            if (isset($option['formatter'])) {
-                $handler->setFormatter(
-                    $this->newInstanceWithOption($option['formatter'])
-                );
-            }
-
-            if (isset($option['level'])) {
-                $handler->setLevel($option['level']);
-            }
-
-            $logger->pushHandler($handler);
-        }
-    }
-
-    /**
-     * @param \Mellivora\Logger\Logger $logger
-     * @param array                    $processors
-     */
-    protected function initLoggerProcessors(Logger $logger, array $processors)
-    {
-        foreach ($processors as $option) {
-            $logger->pushProcessor($this->newInstanceWithOption($option));
-        }
-    }
-
-    /**
-     * @param \Mellivora\Logger\Logger $logger
-     * @param array                    $filters
-     */
-    protected function initLoggerFilters(Logger $logger, array $filters)
-    {
-        foreach ($filters as $option) {
-            $logger->pushFilter($this->newInstanceWithOption($option));
-        }
-    }
-
-    /**
-     * 允许 LoggerFactory 被直接调用，调用的 logger 为 default 设置
-     *
-     * <code>
-     * $loggerFactory->info('log message');
-     * </code>
-     *
-     * @param string $method
-     * @param mixed  $args
-     *
-     * @return mixed
-     */
-    public function __call($method, $args)
-    {
-        return call_user_func_array([$this->getDefault(), $method], $args);
-    }
-
-    /*
-     * 以下为 \ArrayAccess 接口要求实现的方法
-     * 通过实现以下方法，允许像数组一样，访问该类
-     */
-
-    /**
-     * 注册 logger
+     * 注册一个 logger
      *
      * @param string                   $channel
      * @param \Mellivora\Logger\Logger $logger
      *
      * @return $this
      */
-    public function offsetSet($channel, Logger $logger)
+    public function offsetSet($channel, $logger)
     {
         return $this->addLogger($channel, $logger);
     }
@@ -362,5 +320,52 @@ class LoggerFactory implements \ArrayAccess
     public function offsetUnset($channel)
     {
         return false;
+    }
+
+    /**
+     * 根据选项参数，创建类实例
+     *
+     *  option 需要以下参数：
+     *      class:  用于指定完整的类名（包含 namespace 部分）
+     *      params: 用于指定参数列表，使用 key-value 对应类的构造方法参数列表
+     *
+     *  例如：
+     *      $logger = $this->newInstanceWithOption([
+     *          'class' => '\Mellivora\Logger\Logger',
+     *          'params' => ['name' => 'myname'],
+     *      ]);
+     *
+     * 相当于： $logger = new \Mellivora\Logger\Logger('myname');
+     *
+     * @param array $option
+     *
+     * @throws \Exception
+     *
+     * @return object
+     */
+    protected function newInstanceWithOption($option)
+    {
+        if (empty($option['class'])) {
+            throw new \InvalidArgumentException("Missing the 'class' parameter");
+        }
+
+        $class = $option['class'];
+        if (! class_exists($class)) {
+            throw new \RuntimeException("Class '$class' not found");
+        }
+
+        $params = empty($option['params']) ? null : $option['params'];
+        if (empty($params)) {
+            return new $class;
+        }
+
+        $class = new \ReflectionClass($class);
+
+        $data = [];
+        foreach ($class->getConstructor()->getParameters() as $p) {
+            $data[$p->getName()] = $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null;
+        }
+
+        return $class->newInstanceArgs(array_merge($data, $params));
     }
 }

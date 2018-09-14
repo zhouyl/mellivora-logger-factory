@@ -20,7 +20,7 @@ $fixers = [
     'comment_to_phpdoc'           => true,
     'compact_nullable_typehint'   => true,
     'concat_space'                => [
-        'spacing' => 'none',
+        'spacing' => 'one',
     ],
     'escape_implicit_backslashes'  => true,
     'explicit_indirect_variable'   => true,

@@ -9,7 +9,7 @@ use Monolog\Logger;
  * 该 handler 通过对 Swift_Mailer 的调用，来完成邮件的发送
  * 主要使用 Swift_SmtpTransport 进行邮件传输
  */
-class SMTPHandler extends AbstractProcessingHandler
+class SmtpHandler extends AbstractProcessingHandler
 {
     /**
      * @var \Swift_Mailer
@@ -55,7 +55,6 @@ class SMTPHandler extends AbstractProcessingHandler
      * @param int          $maxRecords
      * @param int          $level
      * @param bool         $bubble
-     * @param mixed        $maxRecords
      */
     public function __construct(
         $sender,
@@ -76,7 +75,7 @@ class SMTPHandler extends AbstractProcessingHandler
         $certificates += $this->certificates;
 
         // 创建 transport
-        $transport = \Swift_SmtpTransport::newInstance($certificates['host'], $certificates['port']);
+        $transport = new \Swift_SmtpTransport($certificates['host'], $certificates['port']);
 
         if (! empty($certificates['username'])) {
             $transport->setUsername($certificates['username'])->setPassword($certificates['password']);
@@ -86,9 +85,8 @@ class SMTPHandler extends AbstractProcessingHandler
         list($fromaddr, $fromname) = $this->parseAddress($sender);
 
         // 创建邮件消息
-        $message = \Swift_Message::newInstance($subject, null, 'text/plain', 'utf-8')
-            ->setDate(time())
-            ->setFrom($fromaddr, $fromname);
+        $message = new \Swift_Message($subject, null, 'text/plain', 'utf-8');
+        $message->setDate(new \DateTime())->setFrom($fromaddr, $fromname);
 
         // 设置收件人地址
         foreach ((array) $receivers as $receiver) {
@@ -96,7 +94,7 @@ class SMTPHandler extends AbstractProcessingHandler
             $message->addTo($addr, $name);
         }
 
-        $this->mailer     = \Swift_Mailer::newInstance($transport);
+        $this->mailer     = new \Swift_Mailer($transport);
         $this->message    = $message;
         $this->maxRecords = $maxRecords;
     }
