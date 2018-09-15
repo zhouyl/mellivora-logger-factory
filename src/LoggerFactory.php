@@ -264,7 +264,7 @@ class LoggerFactory implements \ArrayAccess
      */
     public function exists($channel)
     {
-        return isset(self::$loggers[$channel]);
+        return isset($this->loggers[$channel]);
     }
 
     /**
