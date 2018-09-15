@@ -27,7 +27,7 @@
         "friendsofphp/php-cs-fixer": "~2",
         "hassankhan/config": "~1.0",
         "phpunit/phpunit": "~5.0",
-        "swiftmailer/swiftmailer": "~6.1",
+        "swiftmailer/swiftmailer": "~5.4.9",
         "symfony/yaml": "~3.4"
     },
     "autoload": {
