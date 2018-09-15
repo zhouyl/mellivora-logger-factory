@@ -360,18 +360,16 @@ class LoggerFactory implements \ArrayAccess
             throw new \RuntimeException("Class '$class' not found");
         }
 
-        $params = empty($option['params']) ? null : $option['params'];
-        if (empty($params)) {
+        if (empty($option['params'])) {
             return new $class;
         }
 
-        $class = new \ReflectionClass($class);
-
-        $data = [];
-        foreach ($class->getConstructor()->getParameters() as $p) {
-            $data[$p->getName()] = $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null;
+        $ref    = new \ReflectionClass($class);
+        $values = [];
+        foreach ($ref->getConstructor()->getParameters() as $p) {
+            $values[$p->getName()] = $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null;
         }
 
-        return $class->newInstanceArgs(array_merge($data, $params));
+        return $ref->newInstanceArgs(array_merge($values, $option['params']));
     }
 }
