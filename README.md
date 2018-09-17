@@ -16,7 +16,7 @@ composer require monolog/monolog
 $factory = Mellivora\Logger\LoggerFactory::build('config/logger.php');
 ```
 
-`yaml/json/ini` 格式通过 `buildWith` 方法加载配置
+`yaml/json/ini` 格式通过 `buildWith` 方法加载配置，需要 `hassankhan/config` 库的支持，其中 `yaml` 格式需要 `symfony/yaml` 库的支持
 
 ```php
 $factory = Mellivora\Logger\LoggerFactory::buildWith('config/logger.yaml');
