@@ -26,18 +26,34 @@ $factory = Mellivora\Logger\LoggerFactory::buildWith('config/logger.yaml');
 
 ```php
 $factory->get('cli');
+// or
+$factory['cli'];
 ```
 
 根据 default 获取一个未定义的 logger
 
 ```php
 $factory->get('foo');
+// or
+$factory['foo'];
 ```
 
 根据 handlers 配置，创建一个 logger
 
 ```php
 $factory->make('bar', ['cli', 'file']);
+```
+
+也可以把自己定义的 logger 添加到 factory 中
+
+```php
+$factory->add('foo', new Monolog\Logger('mylogger'));
+```
+
+并以自定义的 logger 做为默认 logger
+
+```php
+$factory->setDefault('foo');
 ```
 
 ## 3. 配置
