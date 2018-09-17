@@ -5,7 +5,7 @@
 ## 1. 安装
 
 ```bash
-composer require monolog/monolog
+composer require mellivora/logger-factory
 ```
 
 ## 2. 使用
