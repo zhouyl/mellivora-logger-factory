@@ -13,7 +13,7 @@ composer require monolog/monolog
 根据配置文件实例化
 
 ```php
-$factory = Mellivora\Logger\LoggerFactory::build('config/logger.php');
+$factory = Mellivora\Logger\LoggerFactory::build(require 'config/logger.php');
 ```
 
 `yaml/json/ini` 格式通过 `buildWith` 方法加载配置，需要 `hassankhan/config` 库的支持，其中 `yaml` 格式需要 `symfony/yaml` 库的支持
