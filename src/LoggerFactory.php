@@ -223,7 +223,7 @@ class LoggerFactory implements \ArrayAccess
             return $logger->pushHandler(new NullHandler);
         }
 
-        foreach (is_array($handlers) ? $handlers : [] as $handlerName) {
+        foreach (is_array($handlers) ? $handlers : [$handlers] as $handlerName) {
             if (! isset($this->handlers[$handlerName])) {
                 continue;
             }
