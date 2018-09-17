@@ -3,6 +3,8 @@
 namespace Mellivora\Logger\Tests;
 
 use Mellivora\Logger\LoggerFactory;
+use Monolog\Handler\NullHandler;
+use Psr\Log\NullLogger;
 
 /**
  * @internal
@@ -29,7 +31,7 @@ class LoggerFactoryTest extends TestCase
 
     public function testRootPath()
     {
-        $this->assertSame(LoggerFactory::getRootPath(), dirname(__DIR__));
+        $this->assertSame(dirname(__DIR__), LoggerFactory::getRootPath());
         $this->assertSame(
             __FILE__,
             $this->withRootPath('/tests/' . basename(__FILE__))
@@ -43,5 +45,41 @@ class LoggerFactoryTest extends TestCase
             $factory = LoggerFactory::buildWith($file);
             $this->assertTrue($factory->exists($factory->getDefault()));
         }
+    }
+
+    public function testDefault()
+    {
+        $this->factory->setDefault('cli');
+        $this->assertSame('cli', $this->factory->getDefault());
+
+        $this->expectException(\RuntimeException::class);
+        $this->factory->setDefault('foo');
+    }
+
+    public function testAccessor()
+    {
+        $logger = new NullLogger;
+        $this->factory->add('null', $logger);
+        $this->assertTrue($this->factory->exists('null'));
+
+        $this->assertSame($logger, $this->factory->get('null'));
+        $this->assertSame($logger, $this->factory['null']);
+
+        $this->assertFalse($this->factory->exists('not_exist_logger'));
+        $this->assertFalse(isset($this->factory['not_exist_logger']));
+
+        unset($this->factory['null']);
+        $this->assertTrue($this->factory->exists('null'));
+
+        $this->factory->release();
+        $this->assertFalse($this->factory->exists('null'));
+
+        $this->factory['null'] = $logger;
+        $this->assertTrue($this->factory->exists('null'));
+
+        $this->assertInstanceOf(
+            NullHandler::class,
+            $this->factory->make('make_null')->popHandler()
+        );
     }
 }

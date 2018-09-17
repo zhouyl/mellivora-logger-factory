@@ -72,15 +72,15 @@ handlers:
   mail:
     class: Mellivora\Logger\Handler\SmtpHandler
     params:
-      sender: logger-factory <oa@jrq.com>
+      sender: logger-factory <sender@mailhost.com>
       receivers:
-        - zhouyl <zhouyonglong@globalegrow.com>
+        - zhouyl <81438567@qq.com>
       subject: "[ERROR] FROM Logger-Factory"
       certificates:
-        host: smtp.exmail.qq.com
+        host: smtp.mailhost.com
         port: 25
-        username: oa@jrq.com
-        password: rRy-7tT-Jq8-mJ6
+        username: sender@mailhost.com
+        password: sender-passwd
       maxRecords: 10
       level: CRITICAL
     formatter: venbose

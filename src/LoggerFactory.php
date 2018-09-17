@@ -2,7 +2,9 @@
 
 namespace Mellivora\Logger;
 
+use Monolog\Handler\NullHandler;
 use Noodlehaus\Config;
+use Psr\Log\LoggerInterface;
 
 /**
  * 日志工厂类 -  通过参数配置来管理项目的日志
@@ -173,11 +175,11 @@ class LoggerFactory implements \ArrayAccess
      * 注册一个 logger 实例
      *
      * @param string                   $channel
-     * @param \Mellivora\Logger\Logger $logger
+     * @param \Psr\Log\LoggerInterface $logger
      *
      * @return \Mellivora\Logger\LoggerFactory
      */
-    public function add($channel, Logger $logger)
+    public function add($channel, LoggerInterface $logger)
     {
         $this->instances[$channel] = $logger;
 
@@ -193,15 +195,11 @@ class LoggerFactory implements \ArrayAccess
      */
     public function get($channel = null)
     {
-        $default = $this->getDefault();
-
-        if (empty($channel) || ! isset($this->loggers[$channel])) {
-            $channel = $default;
-        }
+        $channel = empty($channel) ? $this->getDefault() : $channel;
 
         if (! isset($this->instances[$channel])) {
             $this->instances[$channel] = $this->make(
-                $channel,
+                isset($this->loggers[$channel]) ? $channel : $this->getDefault(),
                 $this->loggers[$channel] ? $this->loggers[$channel] : []
             );
         }
@@ -264,7 +262,7 @@ class LoggerFactory implements \ArrayAccess
      */
     public function exists($channel)
     {
-        return isset($this->loggers[$channel]);
+        return isset($this->loggers[$channel]) || isset($this->instances[$channel]);
     }
 
     /**

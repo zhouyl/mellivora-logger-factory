@@ -53,7 +53,7 @@ class LoggerTest extends TestCase
     public function testLevel()
     {
         $this->logger->setLevel(Logger::INFO);
-        $this->assertSame($this->logger->getLevel(), Logger::INFO);
+        $this->assertSame(Logger::INFO, $this->logger->getLevel());
 
         $this->logger->warning('warning');
         $this->assertStringContains($this->lastLogString(), 'warning');
@@ -92,6 +92,6 @@ class LoggerTest extends TestCase
 
     public function testToString()
     {
-        $this->assertSame($this->logger->__toString(), 'Logger(testcase)');
+        $this->assertSame('Logger(testcase)', $this->logger->__toString());
     }
 }
