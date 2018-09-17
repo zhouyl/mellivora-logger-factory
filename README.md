@@ -182,3 +182,7 @@ class PasswordFilter
     }
 }
 ```
+
+## License
+
+The MIT License (MIT). Please see License File for more information.
