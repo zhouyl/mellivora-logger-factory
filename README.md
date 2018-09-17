@@ -183,6 +183,23 @@ class PasswordFilter
 }
 ```
 
+## 5. 日志路径支持
+
+`Mellivora\Logger\LoggerFactory` 提供了关于项目根目录设置的方法，用于来协助日志文件目录定位。
+
+```php
+use Mellivora\Logger\LoggerFactory;
+LoggerFactory::setRootPath('/your/application');
+```
+
+在 `Mellivora\Logger\Handler\NamedRotatingFileHandler` 中，采用了如下方法来获取日志目录
+
+```php
+$filename = LoggerFactory::getRootPath() . '/' . $filename;
+```
+
+你也可以利用 `LoggerFactory::getRootPath()` 来定义自己的日志 handler，协助方便的指定日志路径。
+
 ## License
 
 The MIT License (MIT). Please see License File for more information.
