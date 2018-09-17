@@ -94,7 +94,7 @@ class SmtpHandler extends AbstractProcessingHandler
 
         // 创建邮件消息
         $message = new \Swift_Message($subject, null, 'text/plain', 'utf-8');
-        $message->setDate(new \DateTime())->setFrom($fromaddr, $fromname);
+        $message->setDate(time())->setFrom($fromaddr, $fromname);
 
         // 设置收件人地址
         foreach ((array) $receivers as $receiver) {
@@ -123,7 +123,7 @@ class SmtpHandler extends AbstractProcessingHandler
     protected function parseAddress($address)
     {
         // 识别 "name <my@mailhost.com>" 类似的格式
-        preg_match('/^(.+)<([a-z][\w\.\-]+@[\w\-]+(\.\w+)+)>$/i', $address, $matches);
+        preg_match('/^(.+)<([a-z0-9][\w\.\-]+@[\w\-]+(\.\w+)+)>$/i', $address, $matches);
 
         if (count($matches) === 4) {
             return [trim($matches[2]), trim($matches[1])];
@@ -142,7 +142,7 @@ class SmtpHandler extends AbstractProcessingHandler
                 (?:\.\d{1,3}){3}
             )$/ixD';
 
-        if (preg_match($pattern, $email)) {
+        if (preg_match($pattern, $address)) {
             return [$address, strstr($address, '@', true)];
         }
 
