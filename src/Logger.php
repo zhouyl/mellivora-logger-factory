@@ -155,6 +155,33 @@ class Logger extends MonoLogger
     }
 
     /**
+     * 新增一个异常消息，并自动获取消息的摘要信息并存储到 extra 中
+     *
+     * @param \Exception|\Throwable $ex
+     * @param int                   $level
+     *
+     * @return bool
+     */
+    public function addException($ex, $level = self::ERROR)
+    {
+        if ($ex instanceof \Throwable || $ex instanceof \Exception) {
+            return $this->addRecord(
+                $level,
+                $ex->getMessage(),
+                [
+                    'exception' => get_class($ex),
+                    'code'      => $ex->getCode(),
+                    'message'   => $ex->getMessage(),
+                    'file'      => $ex->getFile(),
+                    'line'      => $ex->getLine(),
+                ]
+            );
+        }
+
+        return false;
+    }
+
+    /**
      * @return string
      */
     public function __toString()

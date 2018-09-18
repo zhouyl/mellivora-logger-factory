@@ -54,7 +54,7 @@ $handlers = [
     'file' => [
         'class'  => 'Mellivora\Logger\Handler\NamedRotatingFileHandler',
         'params' => [
-            'filename'    => '%root%/logs/%channel%.log',
+            'filename'    => 'logs/%channel%.log',
             'maxBytes'    => 100000000, // 100Mb，文件最大尺寸
             'backupCount' => 10, // 文件保留数量
             'bufferSize'  => 10, // 缓冲区大小(日志数量)
@@ -102,6 +102,7 @@ $loggers = [
 
 return [
     'formatters' => $formatters,
+    'processors' => $processors,
     'handlers'   => $handlers,
     'loggers'    => $loggers,
 ];

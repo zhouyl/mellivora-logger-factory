@@ -62,6 +62,16 @@ class LoggerTest extends TestCase
         $this->assertStringNotContains($this->lastLogString(), 'debug');
     }
 
+    public function testAddException()
+    {
+        try {
+            throw new \RuntimeException('test excetpion');
+        } catch (\Exception $ex) {
+            $this->logger->addException($ex);
+        }
+        $this->assertStringContains($this->lastLogString(), 'RuntimeException');
+    }
+
     public function testHandler()
     {
         $handler = new NullHandler;
