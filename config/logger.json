@@ -55,9 +55,6 @@
             },
             "formatter": "json",
             "processors": [
-                "intro",
-                "web",
-                "script",
                 "profiler"
             ]
         },
@@ -67,20 +64,14 @@
                 "stream": "php://stdout",
                 "level": "DEBUG"
             },
-            "formatter": "simple",
-            "processors": [
-                "intro",
-                "web",
-                "script",
-                "profiler"
-            ]
+            "formatter": "simple"
         },
         "mail": {
             "class": "Mellivora\\Logger\\Handler\\SmtpHandler",
             "params": {
                 "sender": "logger-factory <sender@mailhost.com>",
                 "receivers": [
-                    "zhouyl <81438567@qq.com>"
+                    "receiver <receiver@mailhost.com>"
                 ],
                 "subject": "[ERROR] FROM Logger-Factory",
                 "certificates": {
@@ -103,7 +94,6 @@
     },
     "loggers": {
         "default": [
-            "cli",
             "file",
             "mail"
         ],
@@ -113,7 +103,6 @@
             "mail"
         ],
         "exception": [
-            "cli",
             "file",
             "mail"
         ]

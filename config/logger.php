@@ -61,7 +61,7 @@ $handlers = [
             'level'       => 'INFO',
         ],
         'formatter'  => 'json',
-        'processors' => ['intro', 'web', 'script', 'profiler'],
+        'processors' => ['profiler'],
     ],
     'cli' => [
         'class'  => 'Monolog\Handler\StreamHandler',
@@ -76,7 +76,7 @@ $handlers = [
         'params' => [
             'sender'     => 'logger-factory <sender@mailhost.com>',
             'receivers'  => [
-                'zhouyl <81438567@qq.com>',
+                'receiver <receiver@mailhost.com>',
             ],
             'subject'      => '[ERROR] FROM Logger-Factory',
             'certificates' => [
@@ -95,9 +95,9 @@ $handlers = [
 
 // loggers -  当声明的 logger 不在以下列表中时，默认为 default
 $loggers = [
-    'default'   => ['cli', 'file', 'mail'],
+    'default'   => ['file', 'mail'],
     'cli'       => ['cli', 'file', 'mail'],
-    'exception' => ['cli', 'file', 'mail'],
+    'exception' => ['file', 'mail'],
 ];
 
 return [
