@@ -209,7 +209,6 @@ class NamedRotatingFileHandler extends StreamHandler
         $offset = count($logFiles) - $this->backupCount + 1;
         if ($this->backupCount && $offset > 0) {
             foreach (array_slice($logFiles, 0, $offset) as $logfile) {
-                echo "-- unlink $logfile --\n";
                 @unlink($logfile);
             }
             $logFiles = array_slice($logFiles, $offset);
@@ -217,7 +216,6 @@ class NamedRotatingFileHandler extends StreamHandler
 
         // rename the older files
         for ($i = count($logFiles); $i > 0; --$i) {
-            echo "-- rename $baseFile-$i => $baseFile-$i+1 --\n";
             $this->rename($baseFile . $i, $baseFile . ($i + 1));
         }
 
