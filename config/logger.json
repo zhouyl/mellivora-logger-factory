@@ -36,10 +36,22 @@
                 "level": "ERROR"
             }
         },
-        "profiler": {
-            "class": "Mellivora\\Logger\\Processor\\ProfilerProcessor",
+        "cost": {
+            "class": "Mellivora\\Logger\\Processor\\CostTimeProcessor",
             "params": {
                 "level": "DEBUG"
+            }
+        },
+        "memory": {
+            "class": "Monolog\\Processor\\MemoryUsageProcessor",
+            "params": {
+                "level": "ERROR"
+            }
+        },
+        "memoryPeak": {
+            "class": "Monolog\\Processor\\MemoryPeakUsageProcessor",
+            "params": {
+                "level": "ERROR"
             }
         }
     },
@@ -47,10 +59,11 @@
         "file": {
             "class": "Mellivora\\Logger\\Handler\\NamedRotatingFileHandler",
             "params": {
-                "filename": "logs/%channel%.log",
+                "filename": "logs/%channel%.%date%.log",
                 "maxBytes": 100000000,
                 "backupCount": 10,
                 "bufferSize": 10,
+                "dateFormat": "Y-m-d",
                 "level": "INFO"
             },
             "formatter": "json",

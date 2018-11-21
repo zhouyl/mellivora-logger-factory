@@ -38,11 +38,23 @@ processors:
     params:
       level: ERROR
 
-  # 用于性能分析
-  profiler:
-    class: Mellivora\Logger\Processor\ProfilerProcessor
+  # 用于时间成本分析
+  cost:
+    class: Mellivora\Logger\Processor\CostTimeProcessor
     params:
       level: DEBUG
+
+  # 用于内存使用情况分析
+  memory:
+    class: Monolog\Processor\MemoryUsageProcessor
+    params:
+      level: ERROR
+
+  # 用于内存使用情况分析
+  memoryPeak:
+    class: Monolog\Processor\MemoryPeakUsageProcessor
+    params:
+      level: ERROR
 
 # handlers - 通过拼装 formatter/processor，用于日志输出方式的设定
 handlers:
@@ -51,13 +63,14 @@ handlers:
   file:
     class: Mellivora\Logger\Handler\NamedRotatingFileHandler
     params:
-      filename: "logs/%channel%.log"
+      filename: "logs/%date%.%channel%.log"
       maxBytes: 100000000 # 100Mb，文件最大尺寸
       backupCount: 10 # 文件保留数量
-      bufferSize: 10 # 缓冲区大小(日志数量)
+      bufferSize: 0 # 缓冲区大小(日志数量)
+      dateFormat: Y-m-d # 日期格式
       level: INFO
     formatter: json
-    processors: [profiler]
+    processors: [intro, web, script, cost, memory]
 
   # 命令行模式，输出简单日志内容
   cli:
@@ -65,7 +78,8 @@ handlers:
     params:
       stream: php://stdout
       level: DEBUG
-    formatter: simple
+    formatter: json
+    processors: [intro, web, script, cost, memory]
 
   # 邮件预警，仅报告致命错误 CRITICAL
   mail:
@@ -83,7 +97,7 @@ handlers:
       maxRecords: 10
       level: CRITICAL
     formatter: venbose
-    processors: [intro, web, script, profiler]
+    processors: [intro, web, script, cost, memory, memoryPeak]
 
 # loggers -  当声明的 logger 不在以下列表中时，默认为 default
 loggers:

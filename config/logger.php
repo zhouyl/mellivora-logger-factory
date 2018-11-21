@@ -42,10 +42,22 @@ $processors = [
         'params' => ['level' => 'ERROR'],
     ],
 
-    // 用于性能分析
-    'profiler' => [
-        'class'  => Mellivora\Logger\Processor\ProfilerProcessor::class,
+    // 用于时间成本分析
+    'cost' => [
+        'class'  => Mellivora\Logger\Processor\CostTimeProcessor::class,
         'params' => ['level' => 'DEBUG'],
+    ],
+
+    // 用于内存使用情况分析
+    'memory' => [
+        'class'  => Monolog\Processor\MemoryUsageProcessor::class,
+        'params' => ['level' => 'ERROR'],
+    ],
+
+    // 用于时间成本分析
+    'cost' => [
+        'class'  => Monolog\Processor\MemoryPeakUsageProcessor::class,
+        'params' => ['level' => 'ERROR'],
     ],
 ];
 
@@ -54,14 +66,15 @@ $handlers = [
     'file' => [
         'class'  => 'Mellivora\Logger\Handler\NamedRotatingFileHandler',
         'params' => [
-            'filename'    => 'logs/%channel%.log',
+            'filename'    => 'logs/%channel%.%date%.log',
             'maxBytes'    => 100000000, // 100Mb，文件最大尺寸
             'backupCount' => 10, // 文件保留数量
             'bufferSize'  => 10, // 缓冲区大小(日志数量)
+            'dateFormat'  => 'Y-m-d', // 日期格式
             'level'       => 'INFO',
         ],
         'formatter'  => 'json',
-        'processors' => ['profiler'],
+        'processors' => ['intro', 'web', 'script', 'cost', 'memory'],
     ],
     'cli' => [
         'class'  => 'Monolog\Handler\StreamHandler',
@@ -69,7 +82,8 @@ $handlers = [
             'stream' => 'php://stdout',
             'level'  => 'DEBUG',
         ],
-        'formatter' => 'simple',
+        'formatter'  => 'simple',
+        'processors' => ['intro', 'web', 'script', 'cost', 'memory'],
     ],
     'mail' => [
         'class'  => 'Mellivora\Logger\Handler\SmtpHandler',
@@ -89,7 +103,7 @@ $handlers = [
             'level'      => 'CRITICAL',
         ],
         'formatter'  => 'venbose',
-        'processors' => ['intro', 'web', 'script', 'profiler'],
+        'processors' => ['intro', 'web', 'script', 'cost', 'memory', 'memoryPeak'],
     ],
 ];
 
