@@ -46,13 +46,7 @@ processors:
 
   # 用于内存使用情况分析
   memory:
-    class: Monolog\Processor\MemoryUsageProcessor
-    params:
-      level: ERROR
-
-  # 用于内存使用情况分析
-  memoryPeak:
-    class: Monolog\Processor\MemoryPeakUsageProcessor
+    class: Mellivora\Logger\Processor\MemoryProcessor
     params:
       level: ERROR
 

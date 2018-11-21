@@ -43,13 +43,7 @@
             }
         },
         "memory": {
-            "class": "Monolog\\Processor\\MemoryUsageProcessor",
-            "params": {
-                "level": "ERROR"
-            }
-        },
-        "memoryPeak": {
-            "class": "Monolog\\Processor\\MemoryPeakUsageProcessor",
+            "class": "Mellivora\\Logger\\Processor\\MemoryProcessor",
             "params": {
                 "level": "ERROR"
             }

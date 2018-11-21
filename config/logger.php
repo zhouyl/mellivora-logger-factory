@@ -50,13 +50,7 @@ $processors = [
 
     // 用于内存使用情况分析
     'memory' => [
-        'class'  => Monolog\Processor\MemoryUsageProcessor::class,
-        'params' => ['level' => 'ERROR'],
-    ],
-
-    // 用于时间成本分析
-    'cost' => [
-        'class'  => Monolog\Processor\MemoryPeakUsageProcessor::class,
+        'class'  => Mellivora\Logger\Processor\MemoryProcessor::class,
         'params' => ['level' => 'ERROR'],
     ],
 ];
