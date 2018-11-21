@@ -24,18 +24,29 @@ class CostTimeProcessor
             return $record;
         }
 
-        $name = $record['channel'];
+        $cost    = 0;
+        $name    = $record['channel'];
+        $hash    = md5(var_export($record, true));
+        $current = microtime(true);
 
         if (! isset(self::$points[$name])) {
-            self::$points[$name] = microtime(true);
-            $cost                = 0.0;
-        } else {
-            $current             = microtime(true);
-            $cost                = round($current - self::$points[$name], 6);
-            self::$points[$name] = $current;
+            self::$points[$name] = [
+                'time' => $current,
+                'hash' => $hash,
+                'cost' => 0,
+            ];
         }
 
-        $record['extra']['cost'] = $cost;
+        // 当多个 handler 同时调用时间计算时，可能会导致时间成本计算不准确
+        elseif ($hash !== self::$points[$name]['hash']) {
+            self::$points[$name] = [
+                'time' => $current,
+                'hash' => $hash,
+                'cost' => round($current - self::$points[$name]['time'], 6),
+            ];
+        }
+
+        $record['extra']['cost'] = self::$points[$name]['cost'];
 
         return $record;
     }

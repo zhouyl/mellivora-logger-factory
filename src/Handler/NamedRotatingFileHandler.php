@@ -93,7 +93,11 @@ class NamedRotatingFileHandler extends StreamHandler
             $this->dirCreated = true;
         }
 
-        return str_replace('%channel%', $channel, $this->filename);
+        return str_replace(
+            ['%date%', '%channel%'],
+            [date($this->dateFormat), $channel],
+            $this->filename
+        );
     }
 
     /**
