@@ -195,13 +195,12 @@ class LoggerFactory implements \ArrayAccess
      */
     public function get($channel = null)
     {
-        $channel = empty($channel) ? $this->getDefault() : $channel;
+        if (empty($channel) || ! isset($this->loggers[$channel])) {
+            $channel = $this->getDefault();
+        }
 
         if (! isset($this->instances[$channel])) {
-            $this->instances[$channel] = $this->make(
-                isset($this->loggers[$channel]) ? $channel : $this->getDefault(),
-                $this->loggers[$channel] ? $this->loggers[$channel] : []
-            );
+            $this->instances[$channel] = $this->make($channel, $this->loggers[$channel]);
         }
 
         return $this->instances[$channel];
