@@ -200,7 +200,7 @@ class LoggerFactory implements \ArrayAccess
         }
 
         if (! isset($this->instances[$channel])) {
-            if (! isset($this->loggers)) {
+            if (! isset($this->loggers[$channel])) {
                 $channel = $this->getDefault();
             }
 
