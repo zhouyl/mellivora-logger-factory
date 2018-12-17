@@ -19,7 +19,7 @@ trait TraitSingleton
     public static function singleton()
     {
         if (! self::$singleton instanceof self) {
-            throw new \RunttimeException('Singleton instance is not registered');
+            throw new \RuntimeException('Singleton instance is not registered');
         }
 
         return self::$singleton;
