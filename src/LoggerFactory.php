@@ -210,7 +210,10 @@ class LoggerFactory implements \ArrayAccess
                 $channel = $this->getDefault();
             }
 
-            $this->instances[$channel] = $this->make($channel, $this->loggers[$channel] ?? null);
+            $this->instances[$channel] = $this->make(
+                $channel,
+                isset($this->loggers[$channel]) ? $this->loggers[$channel] : null
+            );
         }
 
         return $this->instances[$channel];
