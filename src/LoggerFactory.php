@@ -11,12 +11,14 @@ use Psr\Log\LoggerInterface;
  */
 class LoggerFactory implements \ArrayAccess
 {
+    use TraitSingleton;
+
     /**
      * 用于来辅助日志文件定位项目根目录
      *
      * @var string
      */
-    protected static $rootPath = null;
+    protected static $rootPath;
 
     /**
      * 设置项目根目录
@@ -56,7 +58,7 @@ class LoggerFactory implements \ArrayAccess
      */
     public static function build(array $config)
     {
-        return new self($config);
+        return (new self($config))->registerSingleton();
     }
 
     /**
@@ -85,7 +87,7 @@ class LoggerFactory implements \ArrayAccess
      *
      * @var string
      */
-    protected $default = 'default';
+    protected $default;
 
     /**
      * 定义了 logger formatter 配置选项
@@ -125,7 +127,7 @@ class LoggerFactory implements \ArrayAccess
     /**
      * @param array $config
      */
-    public function __construct(array $config)
+    public function __construct(array $config=[])
     {
         $keys = ['formatters', 'processors',  'handlers', 'loggers'];
         foreach ($keys as $key) {
@@ -165,7 +167,11 @@ class LoggerFactory implements \ArrayAccess
     public function getDefault()
     {
         if (empty($this->default)) {
-            $this->default = current(array_keys($this->loggers));
+            if (count($this->loggers)) {
+                $this->default = current(array_keys($this->loggers));
+            } else {
+                $this->default = 'default';
+            }
         }
 
         return $this->default;
@@ -204,7 +210,7 @@ class LoggerFactory implements \ArrayAccess
                 $channel = $this->getDefault();
             }
 
-            $this->instances[$channel] = $this->make($channel, $this->loggers[$channel]);
+            $this->instances[$channel] = $this->make($channel, $this->loggers[$channel] ?? null);
         }
 
         return $this->instances[$channel];
