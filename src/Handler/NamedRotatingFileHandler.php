@@ -200,9 +200,8 @@ class NamedRotatingFileHandler extends StreamHandler
 
         // matching all log files
         $fileInfo = pathinfo($this->url);
-        $date     = date($this->dateFormat);
-        $baseFile = "{$this->url}.$date.";
-        $logFiles = glob("{$this->url}.$date.*");
+        $baseFile = "{$this->url}.";
+        $logFiles = glob("{$this->url}.*");
 
         // sorting the files by name to remove or rename the older ones
         usort($logFiles, function ($a, $b) {
