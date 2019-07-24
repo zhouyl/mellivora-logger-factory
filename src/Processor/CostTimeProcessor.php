@@ -26,7 +26,7 @@ class CostTimeProcessor
 
         $cost    = 0;
         $name    = $record['channel'];
-        $hash    = md5(var_export($record, true));
+        $hash    = md5(print_r($record, true));
         $current = microtime(true);
 
         if (! isset(self::$points[$name])) {
