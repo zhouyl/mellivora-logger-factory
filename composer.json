@@ -1,14 +1,16 @@
 {
     "name": "mellivora/logger-factory",
     "type": "library",
-    "description": "Logger factory component of mellivora framework",
+    "description": "A modern logger factory library based on Monolog for PHP 8.3+, with seamless Laravel integration",
     "keywords": [
-        "framework",
-        "mellivora",
+        "php8",
         "logger",
         "logger-factory",
         "monolog",
-        "psr-log"
+        "psr-log",
+        "laravel",
+        "symfony-mailer",
+        "modern-php"
     ],
     "homepage": "https://github.com/zhouyl/mellivora-logger-factory",
     "license": "MIT",
@@ -19,16 +21,19 @@
         }
     ],
     "require": {
-        "php": ">=5.6.0",
-        "monolog/monolog": "~1.23",
-        "psr/log": "~1.0"
+        "php": ">=8.3.0",
+        "monolog/monolog": "^3.0",
+        "psr/log": "^3.0"
+    },
+    "suggest": {
+        "illuminate/support": "^10.0|^11.0 - Required for Laravel integration",
+        "illuminate/console": "^10.0|^11.0 - Required for Laravel commands",
+        "illuminate/http": "^10.0|^11.0 - Required for Laravel middleware"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "~2",
-        "hassankhan/config": "^2.0",
-        "phpunit/phpunit": "~5.0",
-        "swiftmailer/swiftmailer": "~5.4.9",
-        "symfony/yaml": "~3.4"
+        "friendsofphp/php-cs-fixer": "^3.82",
+        "phpunit/phpunit": "^11.0",
+        "symfony/mailer": "^7.0"
     },
     "autoload": {
         "psr-4": {
@@ -44,11 +49,30 @@
     "config": {
         "sort-packages": true,
         "optimize-autoloader": true,
-        "secure-http": false
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        }
     },
     "scripts": {
-        "test": "./vendor/bin/phpunit;",
-        "phpcs": "./vendor/bin/php-cs-fixer fix -v --diff --dry-run;",
-        "phpcs-fix": "./vendor/bin/php-cs-fixer fix -v;"
+        "test": "./vendor/bin/phpunit",
+        "test:coverage": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text",
+        "test:coverage-html": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-html coverage",
+        "test:coverage-clover": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-clover coverage.xml",
+        "cs-check": "./vendor/bin/php-cs-fixer fix -v --diff --dry-run",
+        "cs-fix": "./vendor/bin/php-cs-fixer fix -v",
+        "quality": [
+            "@cs-check",
+            "@test"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mellivora\\Logger\\Laravel\\MellivoraLoggerServiceProvider"
+            ],
+            "aliases": {
+                "MLog": "Mellivora\\Logger\\Laravel\\Facades\\MLog"
+            }
+        }
     }
 }

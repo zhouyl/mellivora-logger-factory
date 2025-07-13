@@ -10,11 +10,14 @@ $fixers = [
         'syntax' => 'short',
     ],
     'binary_operator_spaces' => [
-        'align_double_arrow' => true,
-        'align_equals'       => true,
+        'operators' => [
+            '=>' => 'align',
+            '='  => 'align',
+        ],
     ],
-    'blank_line_before_return'    => true,
-    'blank_line_before_statement' => true,
+    'blank_line_before_statement' => [
+        'statements' => ['return'],
+    ],
     'combine_consecutive_issets'  => true,
     'combine_consecutive_unsets'  => true,
     'comment_to_phpdoc'           => true,
@@ -26,7 +29,9 @@ $fixers = [
     'explicit_indirect_variable'   => true,
     'fully_qualified_strict_types' => true,
     'heredoc_to_nowdoc'            => true,
-    'hash_to_slash_comment'        => true,
+    'single_line_comment_style'    => [
+        'comment_types' => ['hash'],
+    ],
     'list_syntax'                  => [
         'syntax' => 'long',
     ],
@@ -54,11 +59,12 @@ $fixers = [
             'curly_brace_block',
         ],
     ],
-    'no_extra_consecutive_blank_lines'            => true,
     'no_leading_import_slash'                     => true,
     'no_multiline_whitespace_around_double_arrow' => true,
     'no_null_property_initialization'             => true,
-    'no_short_echo_tag'                           => true,
+    'echo_tag_syntax'                             => [
+        'format' => 'long',
+    ],
     'no_superfluous_elseif'                       => true,
     'no_trailing_comma_in_singleline_array'       => true,
     'no_unneeded_curly_braces'                    => true,
@@ -70,9 +76,13 @@ $fixers = [
     'no_useless_return'                           => true,
     'no_whitespace_in_blank_line'                 => true,
     'not_operator_with_successor_space'           => true,
-    'ordered_imports'                             => true,
+    'ordered_imports'                             => [
+        'imports_order' => ['class', 'function', 'const'],
+    ],
     'php_unit_internal_class'                     => true,
-    'php_unit_ordered_covers'                     => true,
+    'phpdoc_order_by_value'                       => [
+        'annotations' => ['covers'],
+    ],
     'php_unit_set_up_tear_down_visibility'        => true,
     'php_unit_strict'                             => true,
     'php_unit_test_annotation'                    => true,
@@ -92,7 +102,9 @@ $fixers = [
     'single_line_comment_style'                     => true,
     'strict_comparison'                             => true,
     'string_line_ending'                            => true,
-    'trailing_comma_in_multiline_array'             => true,
+    'trailing_comma_in_multiline'                   => [
+        'elements' => ['arrays'],
+    ],
     'yoda_style'                                    => false,
     'no_empty_comment'                              => false,
 ];
@@ -111,7 +123,7 @@ $finder = PhpCsFixer\Finder::create()
     ])
     ->in(__DIR__);
 
-return PhpCsFixer\Config::create()
+return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true) // The --allow-risky option (pass yes or no) allows you to set whether risky rules may run. Default value is taken from config file. Risky rule is a rule, which could change code behaviour. By default no risky rules are run.
     ->setRules($fixers)
     ->setUsingCache(true)

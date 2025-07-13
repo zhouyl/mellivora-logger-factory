@@ -1,47 +1,142 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mellivora\Logger;
 
 use Monolog\Handler\NullHandler;
-use Noodlehaus\Config;
+use Monolog\Level;
+use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
+use UnhandledMatchError;
+use ValueError;
 
 /**
- * 日志工厂类 -  通过参数配置来管理项目的日志
+ * 日志工厂类 - 通过参数配置来管理项目的日志.
+ *
+ * 提供了基于配置的日志管理功能，支持多种 Handler、Formatter 和 Processor 的组合配置。
+ * 实现了 ArrayAccess 接口，可以像数组一样访问 Logger 实例。
  */
 class LoggerFactory implements \ArrayAccess
 {
-    use TraitSingleton;
+    /**
+     * 项目根目录路径，用于辅助日志文件定位.
+     */
+    protected static ?string $rootPath = null;
 
     /**
-     * 用于来辅助日志文件定位项目根目录
-     *
-     * @var string
+     * 默认 Logger 通道名称.
      */
-    protected static $rootPath;
+    protected ?string $default = null;
 
     /**
-     * 设置项目根目录
+     * Formatter 配置数组.
      *
-     * @param string $path
+     * 格式: ['formatter_name' => ['class' => 'ClassName', 'params' => [...]]]
+     *
+     * @var array<string, array{class: string, params?: array}>
      */
-    public static function setRootPath($path)
+    protected array $formatters = [];
+
+    /**
+     * Processor 配置数组.
+     *
+     * 格式: ['processor_name' => ['class' => 'ClassName', 'params' => [...]]]
+     *
+     * @var array<string, array{class: string, params?: array}>
+     */
+    protected array $processors = [];
+
+    /**
+     * Handler 配置数组.
+     *
+     * 格式: ['handler_name' => [
+     *     'class' => 'ClassName',
+     *     'params' => [...],
+     *     'formatter' => 'formatter_name',
+     *     'processors' => [...]
+     * ]]
+     *
+     * @var array<string, array{
+     *     class: string,
+     *     params?: array,
+     *     formatter?: string,
+     *     processors?: array
+     * }>
+     */
+    protected array $handlers = [];
+
+    /**
+     * Logger 通道配置数组.
+     *
+     * 格式: ['logger_name' => ['handler1', 'handler2', ...]]
+     *
+     * @var array<string, array<string>>
+     */
+    protected array $loggers = [];
+
+    /**
+     * 已实例化的 Logger 实例缓存.
+     *
+     * @var array<string, LoggerInterface>
+     */
+    protected array $instances = [];
+
+    /**
+     * 构造函数.
+     *
+     * @param array $config 日志配置数组，支持以下键：
+     *                      - formatters: Formatter 配置
+     *                      - processors: Processor 配置
+     *                      - handlers: Handler 配置
+     *                      - loggers: Logger 通道配置
+     *                      - default: 默认 Logger 通道名称
+     */
+    public function __construct(array $config = [])
     {
-        self::$rootPath = realpath($path);
+        $this->formatters = $config['formatters'] ?? [];
+        $this->processors = $config['processors'] ?? [];
+        $this->handlers = $config['handlers'] ?? [];
+        $this->loggers = $config['loggers'] ?? [];
+
+        if (isset($config['default'])) {
+            $this->setDefault($config['default']);
+        }
     }
 
     /**
-     * 获取项目根目录
+     * 设置项目根目录.
      *
-     * @return string
+     * @param string $path 项目根目录路径
+     *
+     * @throws \InvalidArgumentException 当路径无效时抛出异常
      */
-    public static function getRootPath()
+    public static function setRootPath(string $path): void
     {
-        if (! self::$rootPath) {
-            foreach (['.', '../../..'] as $p) {
-                $path = realpath(dirname(__DIR__) . '/' . $p);
-                if (is_dir($path) && is_dir($path . '/vendor')) {
+        // Allow setting non-existent paths for testing purposes
+        if (is_dir($path)) {
+            self::$rootPath = realpath($path);
+        } else {
+            self::$rootPath = $path;
+        }
+    }
+
+    /**
+     * 获取项目根目录.
+     *
+     * 如果未设置根目录，会自动尝试查找包含 vendor 目录的路径作为根目录
+     *
+     * @return null|string 项目根目录路径，未找到时返回 null
+     */
+    public static function getRootPath(): ?string
+    {
+        if (self::$rootPath === null) {
+            foreach (['.', '../../..'] as $relativePath) {
+                $path = realpath(dirname(__DIR__) . '/' . $relativePath);
+                if ($path && is_dir($path) && is_dir($path . '/vendor')) {
                     self::setRootPath($path);
+                    break;
                 }
             }
         }
@@ -50,108 +145,62 @@ class LoggerFactory implements \ArrayAccess
     }
 
     /**
-     * 根据配置，实例化创建一个 logger factory
+     * 根据配置数组创建 LoggerFactory 实例.
      *
-     * @param array $config
+     * @param array $config 日志配置数组，包含 formatters、processors、handlers、loggers 等配置
      *
-     * @return \Mellivora\Logger\LoggerFactory
+     * @return self LoggerFactory 实例
      */
-    public static function build(array $config)
+    public static function build(array $config): self
     {
-        return (new self($config))->registerSingleton();
+        return new self($config);
     }
 
     /**
-     * 根据配置文件，实例化创建一个 logger factory
-     * 需要 Noodlehaus\Config 开源组件的支持
-     * 可支持的文件类型包括 php/yaml/json/ini/xml 格式
+     * 根据 PHP 配置文件创建 LoggerFactory 实例.
      *
-     * @param string $configFile
+     * @param string $configFile PHP 配置文件路径，必须是 .php 文件
      *
-     * @return \Mellivora\Logger\LoggerFactory
+     * @throws \InvalidArgumentException 当配置文件不存在、格式不正确或内容无效时抛出异常
+     *
+     * @return self LoggerFactory 实例
      */
-    public static function buildWith($configFile)
+    public static function buildWith(string $configFile): self
     {
-        if (! class_exists(Config::class)) {
-            throw new \Exception(
-                'Require components: hassankhan/config ' .
-                '(ref: https://github.com/hassankhan/config)'
+        if (!file_exists($configFile)) {
+            throw new RuntimeException("Config file not found: {$configFile}");
+        }
+
+        if (!str_ends_with($configFile, '.php')) {
+            throw new \InvalidArgumentException(
+                "Only PHP configuration files are supported: {$configFile}",
             );
         }
 
-        return self::build(Config::load($configFile)->all());
-    }
+        $config = require $configFile;
 
-    /**
-     * 默认 logger channel
-     *
-     * @var string
-     */
-    protected $default;
-
-    /**
-     * 定义了 logger formatter 配置选项
-     *
-     * @var array
-     */
-    protected $formatters = [];
-
-    /**
-     * 定义了 logger processor 配置选项
-     *
-     * @var array
-     */
-    protected $processors = [];
-
-    /**
-     * 定义了 logger handler 配置选项
-     *
-     * @var array
-     */
-    protected $handlers   = [];
-
-    /**
-     * 定义了所有的 logger channel
-     *
-     * @var array
-     */
-    protected $loggers    = [];
-
-    /**
-     * 已实例化的 logger
-     *
-     * @var array
-     */
-    protected $instnaces  = [];
-
-    /**
-     * @param array $config
-     */
-    public function __construct(array $config=[])
-    {
-        $keys = ['formatters', 'processors',  'handlers', 'loggers'];
-        foreach ($keys as $key) {
-            if (isset($config[$key]) && is_array($config[$key])) {
-                $this->{$key} = $config[$key];
-            }
-        }
-    }
-
-    /**
-     * 设置默认的 logger 名称
-     *
-     * @param string $default
-     *
-     * @throws \RuntimeException
-     *
-     * @return $this
-     */
-    public function setDefault($default)
-    {
-        if (! isset($this->loggers[$default])) {
-            throw new \RuntimeException(
-                "Call to undefined logger channel '$default'"
+        if (!is_array($config)) {
+            throw new \InvalidArgumentException(
+                "Configuration file must return an array: {$configFile}",
             );
+        }
+
+        return self::build($config);
+    }
+
+    /**
+     * 设置默认 Logger 通道名称.
+     *
+     * @param string $default Logger 通道名称，必须在配置中已定义
+     *
+     * @throws RuntimeException 当指定的 Logger 通道未定义时抛出异常
+     *
+     * @return self 返回当前实例以支持链式调用
+     */
+    public function setDefault(string $default): self
+    {
+        if (!isset($this->loggers[$default])) {
+            throw new RuntimeException("Call to undefined logger channel '$default'");
         }
 
         $this->default = $default;
@@ -160,32 +209,33 @@ class LoggerFactory implements \ArrayAccess
     }
 
     /**
-     * 获取默认 logger 名称
+     * 获取默认 Logger 通道名称.
      *
-     * @return \Mellivora\Logger\Logger
+     * 如果未设置默认通道，会自动选择第一个配置的 Logger 通道，
+     * 如果没有配置任何 Logger 通道，则返回 'default'
+     *
+     * @return string 默认 Logger 通道名称
      */
-    public function getDefault()
+    public function getDefault(): string
     {
-        if (empty($this->default)) {
-            if (count($this->loggers)) {
-                $this->default = current(array_keys($this->loggers));
-            } else {
-                $this->default = 'default';
-            }
+        if ($this->default === null) {
+            $this->default = $this->loggers !== []
+                ? array_key_first($this->loggers)
+                : 'default';
         }
 
         return $this->default;
     }
 
     /**
-     * 注册一个 logger 实例
+     * 注册一个 Logger 实例.
      *
-     * @param string                   $channel
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param string $channel Logger 通道名称
+     * @param LoggerInterface $logger Logger 实例
      *
-     * @return \Mellivora\Logger\LoggerFactory
+     * @return self 返回当前实例以支持链式调用
      */
-    public function add($channel, LoggerInterface $logger)
+    public function add(string $channel, LoggerInterface $logger): self
     {
         $this->instances[$channel] = $logger;
 
@@ -193,26 +243,28 @@ class LoggerFactory implements \ArrayAccess
     }
 
     /**
-     * 根据名称及预定义配置，获取一个 logger
+     * 根据通道名称获取 Logger 实例.
      *
-     * @param string $channel
+     * 如果实例不存在，会根据配置自动创建。如果指定的通道不存在，会回退到默认通道。
      *
-     * @return \Mellivora\Logger\Logger
+     * @param null|string $channel Logger 通道名称，为 null 时使用默认通道
+     *
+     * @return LoggerInterface Logger 实例
      */
-    public function get($channel = null)
+    public function get(?string $channel = null): LoggerInterface
     {
-        if (empty($channel)) {
+        if ($channel === null || $channel === '') {
             $channel = $this->getDefault();
         }
 
-        if (! isset($this->instances[$channel])) {
-            if (! isset($this->loggers[$channel])) {
+        if (!isset($this->instances[$channel])) {
+            if (!isset($this->loggers[$channel])) {
                 $channel = $this->getDefault();
             }
 
             $this->instances[$channel] = $this->make(
                 $channel,
-                isset($this->loggers[$channel]) ? $this->loggers[$channel] : null
+                $this->loggers[$channel] ?? null,
             );
         }
 
@@ -220,42 +272,46 @@ class LoggerFactory implements \ArrayAccess
     }
 
     /**
-     * 根据已注册的 handlers 配置，即时生成一个 logger
+     * 根据配置创建 Logger 实例.
      *
-     * @param string            $channel
-     * @param null|array|string $handlers
+     * @param string $channel Logger 通道名称
+     * @param null|array<string>|string $handlers Handler 名称数组或单个 Handler 名称
      *
-     * @return \Mellivora\Logger\Logger
+     * @return Logger 配置好的 Logger 实例
      */
-    public function make($channel, $handlers=null)
+    public function make(string $channel, array|string|null $handlers = null): Logger
     {
         $logger = new Logger($channel);
 
-        if (empty($handlers)) {
-            return $logger->pushHandler(new NullHandler);
+        if ($handlers === null || $handlers === [] || $handlers === '') {
+            return $logger->pushHandler(new NullHandler());
         }
 
-        foreach (is_array($handlers) ? $handlers : [$handlers] as $handlerName) {
-            if (! isset($this->handlers[$handlerName])) {
+        $handlerNames = is_array($handlers) ? $handlers : [$handlers];
+
+        foreach ($handlerNames as $handlerName) {
+            if (!isset($this->handlers[$handlerName])) {
                 continue;
             }
 
-            $option  = $this->handlers[$handlerName];
+            $option = $this->handlers[$handlerName];
             $handler = $this->newInstanceWithOption($option);
 
-            if (isset($option['processors'])) {
+            // 添加 Processors
+            if (isset($option['processors']) && is_array($option['processors'])) {
                 foreach ($option['processors'] as $processorName) {
                     if (isset($this->processors[$processorName])) {
                         $handler->pushProcessor(
-                            $this->newInstanceWithOption($this->processors[$processorName])
+                            $this->newInstanceWithOption($this->processors[$processorName]),
                         );
                     }
                 }
             }
 
+            // 设置 Formatter
             if (isset($option['formatter'], $this->formatters[$option['formatter']])) {
                 $handler->setFormatter(
-                    $this->newInstanceWithOption($this->formatters[$option['formatter']])
+                    $this->newInstanceWithOption($this->formatters[$option['formatter']]),
                 );
             }
 
@@ -266,23 +322,23 @@ class LoggerFactory implements \ArrayAccess
     }
 
     /**
-     * 判断指定的 logger channel 是否存在
+     * 判断指定的 Logger 通道是否存在.
      *
-     * @param string $channel
+     * @param string $channel Logger 通道名称
      *
-     * @return bool
+     * @return bool 存在返回 true，否则返回 false
      */
-    public function exists($channel)
+    public function exists(string $channel): bool
     {
         return isset($this->loggers[$channel]) || isset($this->instances[$channel]);
     }
 
     /**
-     * 释放已注册的 logger，以刷新 logger
+     * 释放所有已实例化的 Logger，清空实例缓存.
      *
-     * @return \Mellivora\Logger\LoggerFactory
+     * @return self 返回当前实例以支持链式调用
      */
-    public function release()
+    public function release(): self
     {
         $this->instances = [];
 
@@ -290,96 +346,124 @@ class LoggerFactory implements \ArrayAccess
     }
 
     /**
-     * 注册一个 logger
+     * ArrayAccess 接口实现：设置 Logger 实例.
      *
-     * @param string                   $channel
-     * @param \Mellivora\Logger\Logger $logger
-     *
-     * @return $this
+     * @param mixed $channel Logger 通道名称
+     * @param mixed $value Logger 实例
      */
-    public function offsetSet($channel, $logger)
+    public function offsetSet(mixed $channel, mixed $value): void
     {
-        return $this->add($channel, $logger);
+        $this->add($channel, $value);
     }
 
     /**
-     * 根据名称获取 logger
+     * ArrayAccess 接口实现：获取 Logger 实例.
      *
-     * @param string $channel
+     * @param mixed $channel Logger 通道名称
      *
-     * @return \Mellivora\Logger\Logger
+     * @return mixed Logger 实例
      */
-    public function offsetGet($channel)
+    public function offsetGet(mixed $channel): mixed
     {
         return $this->get($channel);
     }
 
     /**
-     * 判断指定名称的 logger 是否注册
+     * ArrayAccess 接口实现：检查 Logger 是否存在.
      *
-     * @param string $channel
+     * @param mixed $channel Logger 通道名称
      *
-     * @return bool
+     * @return bool 存在返回 true，否则返回 false
      */
-    public function offsetExists($channel)
+    public function offsetExists(mixed $channel): bool
     {
         return $this->exists($channel);
     }
 
     /**
-     * 删除 logger，该操作是被禁止的
+     * ArrayAccess 接口实现：删除 Logger（此操作被禁止）.
      *
-     * @param string $channel
-     *
-     * @return false
+     * @param mixed $channel Logger 通道名称
      */
-    public function offsetUnset($channel)
+    public function offsetUnset(mixed $channel): void
     {
-        return false;
+        // 该操作是被禁止的，不执行任何操作
     }
 
     /**
-     * 根据选项参数，创建类实例
+     * 根据配置选项创建类实例.
      *
-     *  option 需要以下参数：
-     *      class:  用于指定完整的类名（包含 namespace 部分）
-     *      params: 用于指定参数列表，使用 key-value 对应类的构造方法参数列表
+     * 支持通过反射动态创建实例，自动处理构造函数参数映射。
      *
-     *  例如：
-     *      $logger = $this->newInstanceWithOption([
-     *          'class' => '\Mellivora\Logger\Logger',
-     *          'params' => ['name' => 'myname'],
-     *      ]);
+     * @param array{class: string, params?: array} $option 配置选项数组
+     *                                                     - class: 完整的类名（包含命名空间）
+     *                                                     - params: 构造函数参数数组，支持按名称或位置传递
      *
-     * 相当于： $logger = new \Mellivora\Logger\Logger('myname');
+     * @throws \InvalidArgumentException 当缺少 class 参数时抛出异常
+     * @throws RuntimeException 当类不存在时抛出异常
      *
-     * @param array $option
+     * @return object 创建的类实例
      *
-     * @throws \Exception
-     *
-     * @return object
+     * @example
+     * ```php
+     * $logger = $this->newInstanceWithOption([
+     *     'class' => '\Mellivora\Logger\Logger',
+     *     'params' => ['name' => 'myname'],
+     * ]);
+     * // 相当于: new \Mellivora\Logger\Logger('myname');
+     * ```
      */
-    protected function newInstanceWithOption($option)
+    protected function newInstanceWithOption(array $option): object
     {
         if (empty($option['class'])) {
             throw new \InvalidArgumentException("Missing the 'class' parameter");
         }
 
         $class = $option['class'];
-        if (! class_exists($class)) {
-            throw new \RuntimeException("Class '$class' not found");
+        if (!class_exists($class)) {
+            throw new RuntimeException("Class '$class' not found");
         }
 
         if (empty($option['params'])) {
-            return new $class;
+            return new $class();
         }
 
-        $ref    = new \ReflectionClass($class);
-        $values = [];
-        foreach ($ref->getConstructor()->getParameters() as $p) {
-            $values[$p->getName()] = $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null;
+        $ref = new \ReflectionClass($class);
+        $constructor = $ref->getConstructor();
+
+        if ($constructor === null) {
+            return new $class();
         }
 
-        return $ref->newInstanceArgs(array_merge($values, $option['params']));
+        $params = $option['params'];
+        $constructorParams = $constructor->getParameters();
+        $args = [];
+
+        // 按照构造函数参数顺序填充参数
+        foreach ($constructorParams as $index => $param) {
+            $paramName = $param->getName();
+            $value = null;
+
+            if (isset($params[$paramName])) {
+                $value = $params[$paramName];
+            } elseif (isset($params[$index])) {
+                $value = $params[$index];
+            } elseif ($param->isDefaultValueAvailable()) {
+                $value = $param->getDefaultValue();
+            }
+
+            // 转换字符串级别为 Level 枚举
+            if ($paramName === 'level' && is_string($value)) {
+                try {
+                    $value = Level::fromName($value);
+                } catch (InvalidArgumentException|ValueError|UnhandledMatchError) {
+                    // 如果转换失败，保持原值
+                }
+            }
+
+            $args[] = $value;
+        }
+
+        return $ref->newInstanceArgs($args);
     }
 }

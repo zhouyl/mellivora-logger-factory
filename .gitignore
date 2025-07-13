@@ -7,7 +7,8 @@
 .project
 .buildpath
 .settings
-.php_cs.cache
+.php-cs-fixer.cache
+.phpunit.cache
 .vscode
 composer.lock
 
@@ -17,5 +18,7 @@ composer.lock
 /_notes
 /node_modules
 /vendor
+/coverage
+coverage.xml
 /examples
 /logs
