@@ -1148,6 +1148,7 @@ grep "ERROR" /path/to/logs/app.log
 
 # 统计日志级别
 grep -c "ERROR\|WARNING\|INFO" /path/to/logs/app.log
+```
 
 ## 🧪 测试覆盖率
 
