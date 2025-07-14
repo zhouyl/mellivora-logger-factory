@@ -1,0 +1,97 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- Complete internationalization support (English + Chinese)
+- Enhanced GitHub Actions workflows
+- Comprehensive documentation in both languages
+
+### Changed
+- All source code comments converted to English
+- Configuration files updated with English descriptions
+- API documentation fully internationalized
+
+### Fixed
+- GitHub Actions workflow compatibility issues
+- Code style compliance improvements
+- Test coverage optimization
+
+## [2.0.1-alpha] - 2024-07-14
+
+### Added
+- **Complete Internationalization**: All documentation and code comments converted to English
+- **Bilingual Documentation**: Full English documentation with preserved Chinese translations
+- **Enhanced Laravel Integration**: Improved Laravel framework support with comprehensive examples
+- **Professional API Documentation**: All function and class comments in English
+- **GitHub Actions Workflows**: Complete CI/CD pipeline with coverage, quality checks, and automated releases
+- **Code Quality Standards**: Updated to PSR-12 standards with PHP CS Fixer
+- **Comprehensive Testing**: 144 tests with 86.43% line coverage
+
+### Changed
+- **Primary Language**: English is now the primary development language
+- **Documentation Structure**: Reorganized with English as main and Chinese in `docs/zh-CN/`
+- **Code Comments**: All source code comments converted to English for international developers
+- **Configuration Files**: All configuration descriptions in English
+- **Examples**: All example code and comments in English
+
+### Improved
+- **Developer Experience**: Easier for international developers to understand and contribute
+- **Code Maintainability**: Professional English documentation standards
+- **Project Accessibility**: Lowered barriers for global PHP community
+- **Quality Assurance**: Enhanced testing and code quality workflows
+
+### Technical Details
+- **PHP Requirements**: 8.3+ (upgraded from 8.1+)
+- **Dependencies**: Updated to latest versions (PHPUnit 12.x, Codecov v5)
+- **Framework Support**: Laravel 10.x and 11.x
+- **Test Coverage**: 86.43% line coverage with 144 comprehensive tests
+- **Code Style**: Full PSR-12 compliance
+
+### Migration Notes
+- This version maintains full backward compatibility
+- Chinese documentation is preserved in `docs/zh-CN/` directory
+- All APIs remain unchanged, only documentation language updated
+- Configuration files maintain same structure with English descriptions
+
+## [2.0.0-alpha] - 2024-07-13
+
+### Added
+- Initial alpha release with modern PHP 8.3+ support
+- Monolog 3.x integration
+- Laravel framework integration
+- Comprehensive processor system
+- Advanced handler implementations
+
+### Features
+- **Core Logger Factory**: Centralized logger management
+- **Multiple Handlers**: File rotation, SMTP email, console output
+- **Rich Processors**: Performance analysis, memory tracking, request context
+- **Laravel Integration**: Service provider, facades, helper functions
+- **Configuration System**: Flexible PHP-based configuration
+- **Testing Suite**: Comprehensive unit tests
+
+### Requirements
+- PHP 8.3 or higher
+- Monolog ^3.0
+- PSR-Log ^3.0
+- Laravel ^10.0 || ^11.0 (optional)
+
+---
+
+## Version History
+
+- **2.0.1-alpha**: Complete internationalization and enhanced workflows
+- **2.0.0-alpha**: Initial modern PHP release with Laravel integration
+
+## Links
+
+- [Repository](https://github.com/zhouyl/mellivora-logger-factory)
+- [Packagist](https://packagist.org/packages/mellivora/logger-factory)
+- [Issues](https://github.com/zhouyl/mellivora-logger-factory/issues)
+- [Documentation](https://github.com/zhouyl/mellivora-logger-factory/blob/master/README.md)
