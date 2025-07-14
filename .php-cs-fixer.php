@@ -6,9 +6,13 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__ . '/src')
     ->in(__DIR__ . '/tests')
     ->in(__DIR__ . '/config')
-    ->in(__DIR__ . '/examples')
     ->name('*.php')
     ->notPath('vendor');
+
+// 只有当 examples 目录存在时才包含它
+if (is_dir(__DIR__ . '/examples')) {
+    $finder->in(__DIR__ . '/examples');
+}
 
 $config = new PhpCsFixer\Config();
 

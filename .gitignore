@@ -20,5 +20,4 @@ composer.lock
 /vendor
 /coverage
 coverage.xml
-/examples
 /logs
