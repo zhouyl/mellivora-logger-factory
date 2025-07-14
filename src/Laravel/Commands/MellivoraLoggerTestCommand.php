@@ -42,16 +42,16 @@ class MellivoraLoggerTestCommand extends Command
         $this->info('Testing Mellivora Logger...');
         $this->newLine();
 
-        // 测试基本日志记录
+        // Test basic logging
         $this->testBasicLogging($channel, $level, $message);
 
-        // 测试所有日志级别
+        // Test all log levels
         $this->testAllLevels($channel);
 
-        // 测试异常记录
+        // Test exception logging
         $this->testExceptionLogging($channel);
 
-        // 测试多通道
+        // Test multiple channels
         $this->testMultipleChannels();
 
         $this->newLine();
@@ -61,7 +61,7 @@ class MellivoraLoggerTestCommand extends Command
     }
 
     /**
-     * 测试基本日志记录.
+     * Test basic logging.
      */
     protected function testBasicLogging(?string $channel, string $level, string $message): void
     {
@@ -81,7 +81,7 @@ class MellivoraLoggerTestCommand extends Command
     }
 
     /**
-     * 测试所有日志级别.
+     * Test all log levels.
      */
     protected function testAllLevels(?string $channel): void
     {
@@ -106,7 +106,7 @@ class MellivoraLoggerTestCommand extends Command
     }
 
     /**
-     * 测试异常记录.
+     * Test exception logging.
      */
     protected function testExceptionLogging(?string $channel): void
     {
@@ -122,7 +122,7 @@ class MellivoraLoggerTestCommand extends Command
     }
 
     /**
-     * 测试多通道.
+     * Test multiple channels.
      */
     protected function testMultipleChannels(): void
     {

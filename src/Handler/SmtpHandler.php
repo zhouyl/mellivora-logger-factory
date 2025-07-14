@@ -109,10 +109,10 @@ class SmtpHandler extends AbstractProcessingHandler
 
         parent::__construct($level, $bubble);
 
-        // 合并配置
+        // Merge configuration
         $certificates = array_merge($this->certificates, $certificates);
 
-        // 构建 DSN
+        // Build DSN
         $auth = '';
         if (!empty($certificates['username'])) {
             $auth = urlencode($certificates['username']) . ':' .
@@ -203,16 +203,16 @@ class SmtpHandler extends AbstractProcessingHandler
     protected function send(): void
     {
         if (!empty($this->records)) {
-            // 解析发件人地址
+            // Parse sender address
             [$fromaddr, $fromname] = $this->parseAddress($this->sender);
 
-            // 创建邮件消息
+            // Create email message
             $email = (new Email())
                 ->from($fromname ? "$fromname <$fromaddr>" : $fromaddr)
                 ->subject($this->subject)
                 ->text((string) $this->getFormatter()->formatBatch($this->records));
 
-            // 设置收件人地址
+            // Set recipient addresses
             foreach ($this->receivers as $receiver) {
                 [$addr, $name] = $this->parseAddress($receiver);
                 $email->addTo($name ? "$name <$addr>" : $addr);

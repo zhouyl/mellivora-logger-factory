@@ -213,12 +213,12 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * 获取默认 Logger 通道名称.
+     * Get default Logger channel name.
      *
-     * 如果未设置默认通道，会自动选择第一个配置的 Logger 通道，
-     * 如果没有配置任何 Logger 通道，则返回 'default'
+     * If default channel is not set, will automatically select the first configured Logger channel,
+     * if no Logger channels are configured, returns 'default'
      *
-     * @return string 默认 Logger 通道名称
+     * @return string Default Logger channel name
      */
     public function getDefault(): string
     {
@@ -232,12 +232,12 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * 注册一个 Logger 实例.
+     * Register a Logger instance.
      *
-     * @param string $channel Logger 通道名称
-     * @param LoggerInterface $logger Logger 实例
+     * @param string $channel Logger channel name
+     * @param LoggerInterface $logger Logger instance
      *
-     * @return self 返回当前实例以支持链式调用
+     * @return self Returns current instance to support method chaining
      */
     public function add(string $channel, LoggerInterface $logger): self
     {
@@ -247,13 +247,13 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * 根据通道名称获取 Logger 实例.
+     * Get Logger instance by channel name.
      *
-     * 如果实例不存在，会根据配置自动创建。如果指定的通道不存在，会回退到默认通道。
+     * If instance doesn't exist, will automatically create based on configuration. If specified channel doesn't exist, will fall back to default channel.
      *
-     * @param null|string $channel Logger 通道名称，为 null 时使用默认通道
+     * @param null|string $channel Logger channel name, uses default channel when null
      *
-     * @return LoggerInterface Logger 实例
+     * @return LoggerInterface Logger instance
      */
     public function get(?string $channel = null): LoggerInterface
     {
@@ -276,12 +276,12 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * 根据配置创建 Logger 实例.
+     * Create Logger instance based on configuration.
      *
-     * @param string $channel Logger 通道名称
-     * @param null|array<string>|string $handlers Handler 名称数组或单个 Handler 名称
+     * @param string $channel Logger channel name
+     * @param null|array<string>|string $handlers Handler name array or single Handler name
      *
-     * @return Logger 配置好的 Logger 实例
+     * @return Logger Configured Logger instance
      */
     public function make(string $channel, array|string|null $handlers = null): Logger
     {
@@ -301,7 +301,7 @@ class LoggerFactory implements ArrayAccess
             $option = $this->handlers[$handlerName];
             $handler = $this->newInstanceWithOption($option);
 
-            // 添加 Processors
+            // Add Processors
             if (isset($option['processors']) && is_array($option['processors'])) {
                 foreach ($option['processors'] as $processorName) {
                     if (isset($this->processors[$processorName])) {
@@ -312,7 +312,7 @@ class LoggerFactory implements ArrayAccess
                 }
             }
 
-            // 设置 Formatter
+            // Set Formatter
             if (isset($option['formatter'], $this->formatters[$option['formatter']])) {
                 $handler->setFormatter(
                     $this->newInstanceWithOption($this->formatters[$option['formatter']]),
@@ -326,11 +326,11 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * 判断指定的 Logger 通道是否存在.
+     * Check if specified Logger channel exists.
      *
-     * @param string $channel Logger 通道名称
+     * @param string $channel Logger channel name
      *
-     * @return bool 存在返回 true，否则返回 false
+     * @return bool Returns true if exists, false otherwise
      */
     public function exists(string $channel): bool
     {
@@ -338,9 +338,9 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * 释放所有已实例化的 Logger，清空实例缓存.
+     * Release all instantiated Loggers, clear instance cache.
      *
-     * @return self 返回当前实例以支持链式调用
+     * @return self Returns current instance to support method chaining
      */
     public function release(): self
     {
@@ -350,10 +350,10 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * ArrayAccess 接口实现：设置 Logger 实例.
+     * ArrayAccess interface implementation: Set Logger instance.
      *
-     * @param mixed $channel Logger 通道名称
-     * @param mixed $value Logger 实例
+     * @param mixed $channel Logger channel name
+     * @param mixed $value Logger instance
      */
     public function offsetSet(mixed $channel, mixed $value): void
     {
@@ -361,11 +361,11 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * ArrayAccess 接口实现：获取 Logger 实例.
+     * ArrayAccess interface implementation: Get Logger instance.
      *
-     * @param mixed $channel Logger 通道名称
+     * @param mixed $channel Logger channel name
      *
-     * @return mixed Logger 实例
+     * @return mixed Logger instance
      */
     public function offsetGet(mixed $channel): mixed
     {
@@ -373,11 +373,11 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * ArrayAccess 接口实现：检查 Logger 是否存在.
+     * ArrayAccess interface implementation: Check if Logger exists.
      *
-     * @param mixed $channel Logger 通道名称
+     * @param mixed $channel Logger channel name
      *
-     * @return bool 存在返回 true，否则返回 false
+     * @return bool Returns true if exists, false otherwise
      */
     public function offsetExists(mixed $channel): bool
     {
@@ -385,28 +385,28 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * ArrayAccess 接口实现：删除 Logger（此操作被禁止）.
+     * ArrayAccess interface implementation: Delete Logger (this operation is prohibited).
      *
-     * @param mixed $channel Logger 通道名称
+     * @param mixed $channel Logger channel name
      */
     public function offsetUnset(mixed $channel): void
     {
-        // 该操作是被禁止的，不执行任何操作
+        // This operation is prohibited, no action is performed
     }
 
     /**
-     * 根据配置选项创建类实例.
+     * Create class instance based on configuration options.
      *
-     * 支持通过反射动态创建实例，自动处理构造函数参数映射。
+     * Supports dynamic instance creation through reflection, automatically handles constructor parameter mapping.
      *
-     * @param array{class: string, params?: array} $option 配置选项数组
-     *                                                     - class: 完整的类名（包含命名空间）
-     *                                                     - params: 构造函数参数数组，支持按名称或位置传递
+     * @param array{class: string, params?: array} $option Configuration options array
+     *                                                     - class: Full class name (including namespace)
+     *                                                     - params: Constructor parameter array, supports passing by name or position
      *
-     * @throws InvalidArgumentException 当缺少 class 参数时抛出异常
-     * @throws RuntimeException 当类不存在时抛出异常
+     * @throws InvalidArgumentException When class parameter is missing
+     * @throws RuntimeException When class does not exist
      *
-     * @return object 创建的类实例
+     * @return object Created class instance
      *
      * @example
      * ```php
@@ -414,7 +414,7 @@ class LoggerFactory implements ArrayAccess
      *     'class' => '\Mellivora\Logger\Logger',
      *     'params' => ['name' => 'myname'],
      * ]);
-     * // 相当于: new \Mellivora\Logger\Logger('myname');
+     * // Equivalent to: new \Mellivora\Logger\Logger('myname');
      * ```
      */
     protected function newInstanceWithOption(array $option): object
@@ -443,7 +443,7 @@ class LoggerFactory implements ArrayAccess
         $constructorParams = $constructor->getParameters();
         $args = [];
 
-        // 按照构造函数参数顺序填充参数
+        // Fill parameters according to constructor parameter order
         foreach ($constructorParams as $index => $param) {
             $paramName = $param->getName();
             $value = null;
@@ -456,12 +456,12 @@ class LoggerFactory implements ArrayAccess
                 $value = $param->getDefaultValue();
             }
 
-            // 转换字符串级别为 Level 枚举
+            // Convert string level to Level enum
             if ($paramName === 'level' && is_string($value)) {
                 try {
                     $value = Level::fromName($value);
                 } catch (PsrInvalidArgumentException|ValueError|UnhandledMatchError) {
-                    // 如果转换失败，保持原值
+                    // If conversion fails, keep original value
                 }
             }
 

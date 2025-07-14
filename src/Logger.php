@@ -189,9 +189,9 @@ class Logger extends MonoLogger
     }
 
     /**
-     * 获取所有已注册的过滤器.
+     * Get all registered filters.
      *
-     * @return array<callable(Level, string, array): bool> 过滤器数组
+     * @return array<callable(Level, string, array): bool> Filter array
      */
     public function getFilters(): array
     {
@@ -199,16 +199,16 @@ class Logger extends MonoLogger
     }
 
     /**
-     * 添加日志记录.
+     * Add log record.
      *
-     * 重写父类方法以支持自定义级别控制和过滤器功能
+     * Override parent method to support custom level control and filter functionality
      *
-     * @param int|Level $level 日志级别
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
-     * @param null|DateTimeInterface $datetime 日志时间
+     * @param int|Level $level Log level
+     * @param string $message Log message
+     * @param array $context Context data
+     * @param null|DateTimeInterface $datetime Log time
      *
-     * @return bool 是否成功记录日志
+     * @return bool Whether log was successfully recorded
      */
     public function addRecord(
         int|Level $level,
@@ -233,14 +233,14 @@ class Logger extends MonoLogger
     }
 
     /**
-     * 记录异常日志.
+     * Record exception log.
      *
-     * 自动提取异常的详细信息（类名、错误码、消息、文件、行号）并记录到日志中
+     * Automatically extract exception details (class name, error code, message, file, line number) and record to log
      *
-     * @param Throwable $ex 异常对象
-     * @param int|Level|string $level 日志级别，默认为 Error
+     * @param Throwable $ex Exception object
+     * @param int|Level|string $level Log level, defaults to Error
      *
-     * @return bool 是否成功记录日志
+     * @return bool Whether log was successfully recorded
      */
     public function addException(Throwable $ex, mixed $level = Level::Error): bool
     {
@@ -267,7 +267,7 @@ class Logger extends MonoLogger
     }
 
     /**
-     * 解析字符串级别.
+     * Parse string level.
      */
     private function parseStringLevel(string $level): Level
     {
