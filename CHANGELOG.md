@@ -7,20 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Complete internationalization support (English + Chinese)
-- Enhanced GitHub Actions workflows
-- Comprehensive documentation in both languages
-
-### Changed
-- All source code comments converted to English
-- Configuration files updated with English descriptions
-- API documentation fully internationalized
+## [2.0.2-alpha] - 2024-07-14
 
 ### Fixed
-- GitHub Actions workflow compatibility issues
-- Code style compliance improvements
-- Test coverage optimization
+- **Chinese Documentation**: Fixed Chinese section headers in `docs/zh-CN/README.md`
+  - Changed "## Installation" to "## 安装"
+  - Changed "## Usage" to "## 使用方法"
+  - Updated example code comments to Chinese
+- **GitHub Actions**: Improved Quality workflow documentation checks
+  - Removed overly restrictive checks for docs subdirectories
+  - Added clarification comments for bilingual documentation support
+  - Maintained quality standards while supporting internationalization
+
+### Changed
+- **Version Badges**: Updated version badges to 2.0.2-alpha in all documentation
+- **Documentation Structure**: Clarified that main README.md uses English while docs/zh-CN/ uses Chinese
+- **Workflow Logic**: Enhanced GitHub Actions to better support bilingual project structure
+
+### Improved
+- **Developer Experience**: Better separation between English and Chinese documentation
+- **CI/CD Reliability**: More robust workflow checks that account for internationalization
+- **Documentation Quality**: Consistent language usage in respective documentation sections
 
 ## [2.0.1-alpha] - 2024-07-14
 

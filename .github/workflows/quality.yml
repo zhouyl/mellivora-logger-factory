@@ -110,16 +110,19 @@ jobs:
           exit 1
         fi
 
-        # Check for required sections
+        # Check for required sections in main README only
         if ! grep -q "## Installation" README.md; then
-          echo "README.md is missing Installation section"
+          echo "Main README.md is missing Installation section"
           exit 1
         fi
 
         if ! grep -q "## Usage" README.md; then
-          echo "README.md is missing Usage section"
+          echo "Main README.md is missing Usage section"
           exit 1
         fi
+
+        # Note: docs/zh-CN/README.md can have Chinese sections like "## 安装" and "## 使用方法"
+        echo "✅ Main README.md has required sections"
 
     - name: Check Laravel documentation
       run: |

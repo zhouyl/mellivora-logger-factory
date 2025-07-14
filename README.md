@@ -1,6 +1,6 @@
 # Mellivora Logger Factory
 
-[![Version](https://img.shields.io/badge/version-2.0.0--alpha-orange.svg)](https://github.com/zhouyl/mellivora-logger-factory/releases)
+[![Version](https://img.shields.io/badge/version-2.0.2--alpha-orange.svg)](https://github.com/zhouyl/mellivora-logger-factory/releases)
 [![CI](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/ci.yml/badge.svg)](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/ci.yml)
 [![Coverage](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/coverage.yml/badge.svg)](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/coverage.yml)
 [![Quality](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/quality.yml/badge.svg)](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/quality.yml)
@@ -13,7 +13,7 @@ A modern logging factory library based on [Monolog](https://seldaek.github.io/mo
 
 **🧪 High Quality Assurance**: Features **88.82%** test coverage with 144 test methods and 367 assertions, ensuring code quality and stability.
 
-> **⚠️ Alpha Version Notice**: Current version is **2.0.0-alpha**, a pre-release version suitable for testing and evaluation. While feature-complete and thoroughly tested, please conduct adequate testing before production use.
+> **⚠️ Alpha Version Notice**: Current version is **2.0.2-alpha**, a pre-release version suitable for testing and evaluation. While feature-complete and thoroughly tested, please conduct adequate testing before production use.
 
 > **🤖 AI-Driven Development**: This project's refactoring and testing improvements were completed entirely by [Augment](https://www.augmentcode.com/) intelligent coding AI tool, demonstrating AI's powerful capabilities in modern software development.
 
@@ -177,7 +177,7 @@ Edit `config/mellivora-logger.php`:
 
 return [
     'default_channel' => env('MELLIVORA_LOG_CHANNEL', 'default'),
-    
+
     'channels' => [
         'default' => [
             'handlers' => [
@@ -189,7 +189,7 @@ return [
                 ],
             ],
         ],
-        
+
         'api' => [
             'handlers' => [
                 [

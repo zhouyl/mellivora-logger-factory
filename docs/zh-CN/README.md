@@ -1,6 +1,6 @@
 # Mellivora Logger Factory
 
-[![Version](https://img.shields.io/badge/version-2.0.0--alpha-orange.svg)](https://github.com/zhouyl/mellivora-logger-factory/releases)
+[![Version](https://img.shields.io/badge/version-2.0.2--alpha-orange.svg)](https://github.com/zhouyl/mellivora-logger-factory/releases)
 [![CI](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/ci.yml/badge.svg)](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/ci.yml)
 [![Coverage](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/coverage.yml/badge.svg)](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/coverage.yml)
 [![Quality](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/quality.yml/badge.svg)](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/quality.yml)
@@ -13,7 +13,7 @@
 
 **🧪 高质量保证**: 拥有 **88.82%** 的测试覆盖率，包含 144 个测试方法和 367 个断言，确保代码质量和稳定性。
 
-> **⚠️ Alpha 版本提醒**: 当前版本为 **2.0.0-alpha**，这是一个预发布版本，适用于测试和评估。虽然功能完整且经过充分测试，但在生产环境使用前请进行充分的测试验证。
+> **⚠️ Alpha 版本提醒**: 当前版本为 **2.0.2-alpha**，这是一个预发布版本，适用于测试和评估。虽然功能完整且经过充分测试，但在生产环境使用前请进行充分的测试验证。
 
 > **🤖 AI 驱动开发**: 本项目的重构和测试完善工作完全由 [Augment](https://www.augmentcode.com/) 智能编码AI工具完成，展示了AI在现代软件开发中的强大能力。
 
@@ -79,23 +79,23 @@
 - **PSR-Log**: ^3.0
 - **Laravel**: ^10.0 | ^11.0 (可选，用于 Laravel 集成)
 
-## Installation
+## 安装
 
-Install the alpha version using Composer:
+使用 Composer 安装 alpha 版本：
 
 ```bash
-# Install alpha version
+# 安装 alpha 版本
 composer require mellivora/logger-factory:^2.0.0-alpha
 
-# Or specify exact version
+# 或指定具体版本
 composer require mellivora/logger-factory:2.0.0-alpha
 ```
 
-> **Note**: Since this is an alpha version, you may need to set `"minimum-stability": "alpha"` in your composer.json or use the `--with-all-dependencies` flag.
+> **注意**: 由于这是 alpha 版本，您可能需要在 composer.json 中设置 `"minimum-stability": "alpha"` 或使用 `--with-all-dependencies` 标志。
 
-## Usage
+## 使用方法
 
-### Basic Usage
+### 基本使用
 
 ```php
 <?php
@@ -103,36 +103,36 @@ composer require mellivora/logger-factory:2.0.0-alpha
 use Mellivora\Logger\LoggerFactory;
 use Monolog\Level;
 
-// Create factory instance
+// 创建工厂实例
 $factory = new LoggerFactory();
 
-// Get default logger
+// 获取默认 Logger
 $logger = $factory->get();
 $logger->info('Hello World!');
 
-// Use specific channel
+// 使用特定通道
 $apiLogger = $factory->get('api');
-$apiLogger->debug('API request processed');
+$apiLogger->debug('API 请求已处理');
 ```
 
-### Laravel Integration
+### Laravel 集成
 
 ```php
 <?php
 
-// Using helper functions
-mlog('info', 'User logged in', ['user_id' => 123]);
-mlog_with('api', 'debug', 'API request');
+// 使用辅助函数
+mlog('info', '用户已登录', ['user_id' => 123]);
+mlog_with('api', 'debug', 'API 请求');
 
-// Using Facade
+// 使用 Facade
 use Mellivora\Logger\Laravel\Facades\MLog;
 
-MLog::info('Application started');
-MLog::logWith('api', 'debug', 'API debug');
+MLog::info('应用程序已启动');
+MLog::logWith('api', 'debug', 'API 调试');
 MLog::exception($exception, 'error');
 ```
 
-For complete Laravel integration guide, see [Laravel Documentation](docs/LARAVEL.md).
+完整的 Laravel 集成指南，请参阅 [Laravel 文档](LARAVEL.md)。
 
 ## 🚀 快速开始
 
