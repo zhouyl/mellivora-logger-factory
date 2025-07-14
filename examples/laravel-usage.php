@@ -3,62 +3,62 @@
 declare(strict_types=1);
 
 /**
- * Laravel 使用示例.
+ * Laravel Usage Examples.
  *
- * 本文件展示了如何在 Laravel 应用中使用 Mellivora Logger Factory
+ * This file demonstrates how to use Mellivora Logger Factory in Laravel applications
  */
 
-// 1. 基本使用 - 辅助函数
-echo "=== 辅助函数使用示例 ===\n";
+// 1. Basic Usage - Helper Functions
+echo "=== Helper Functions Usage Examples ===\n";
 
-// 记录到默认通道
+// Log to default channel
 mlog('info', 'Application started');
 mlog('error', 'Database connection failed', ['host' => 'localhost']);
 
-// 记录到指定通道
+// Log to specific channel
 mlog_with('api', 'info', 'API request received');
 mlog_with('security', 'warning', 'Suspicious login attempt');
 
-// 便捷的级别函数
+// Convenient level functions
 mlog_debug('Debug information');
 mlog_info('User logged in', ['user_id' => 123]);
 mlog_warning('High memory usage detected');
 mlog_error('Payment processing failed');
 mlog_critical('System is down');
 
-// 异常记录
+// Exception logging
 try {
     throw new RuntimeException('Something went wrong', 500);
 } catch (Exception $e) {
     mlog_exception($e, 'error', 'application');
 }
 
-// 2. Facade 使用
-echo "\n=== Facade 使用示例 ===\n";
+// 2. Facade Usage
+echo "\n=== Facade Usage Examples ===\n";
 
 use Mellivora\Logger\Laravel\Facades\MLog;
 
-// 基本日志记录
+// Basic logging
 MLog::log('info', 'Facade logging test');
 MLog::logWith('api', 'debug', 'API debug message');
 
-// 便捷方法
+// Convenient methods
 MLog::info('User action', ['action' => 'profile_update']);
 MLog::error('System error', ['component' => 'payment']);
 
-// 异常记录
+// Exception logging
 try {
     throw new InvalidArgumentException('Invalid data provided');
 } catch (Exception $e) {
     MLog::exception($e, 'warning', 'validation');
 }
 
-// 获取 Logger 实例
+// Get Logger instance
 $apiLogger = MLog::channel('api');
 $apiLogger->info('Direct logger usage');
 
-// 3. 依赖注入使用
-echo "\n=== 依赖注入使用示例 ===\n";
+// 3. Dependency Injection Usage
+echo "\n=== Dependency Injection Usage Examples ===\n";
 
 class UserService
 {
@@ -74,7 +74,7 @@ class UserService
         $logger->info('User creation started', ['data' => $userData]);
 
         try {
-            // 模拟用户创建逻辑
+            // Simulate user creation logic
             $user = [
                 'id' => mt_rand(1000, 9999),
                 'name' => $userData['name'] ?? 'Unknown',
@@ -96,14 +96,14 @@ class UserService
     }
 }
 
-// 4. 控制器示例
-echo "\n=== 控制器使用示例 ===\n";
+// 4. Controller Example
+echo "\n=== Controller Usage Examples ===\n";
 
 class ApiController
 {
     public function handleRequest(array $requestData): array
     {
-        // 记录请求开始
+        // Log request start
         mlog_with('api', 'info', 'API request started', [
             'endpoint' => '/api/users',
             'method' => 'POST',
@@ -111,12 +111,12 @@ class ApiController
         ]);
 
         try {
-            // 验证请求数据
+            // Validate request data
             if (empty($requestData['name'])) {
                 throw new InvalidArgumentException('Name is required');
             }
 
-            // 处理业务逻辑
+            // Process business logic
             $result = [
                 'success' => true,
                 'data' => [
@@ -126,14 +126,14 @@ class ApiController
                 ],
             ];
 
-            // 记录成功
+            // Log success
             mlog_with('api', 'info', 'API request processed successfully', [
                 'result' => $result,
             ]);
 
             return $result;
         } catch (InvalidArgumentException $e) {
-            // 记录验证错误
+            // Log validation error
             mlog_with('api', 'warning', 'API validation failed', [
                 'error' => $e->getMessage(),
                 'data' => $requestData,
@@ -144,7 +144,7 @@ class ApiController
                 'error' => $e->getMessage(),
             ];
         } catch (Exception $e) {
-            // 记录系统错误
+            // Log system error
             mellivora_exception($e, 'error', 'api');
 
             return [
@@ -155,8 +155,8 @@ class ApiController
     }
 }
 
-// 5. 中间件示例
-echo "\n=== 中间件使用示例 ===\n";
+// 5. Middleware Example
+echo "\n=== Middleware Usage Examples ===\n";
 
 class RequestLoggingMiddleware
 {
@@ -164,7 +164,7 @@ class RequestLoggingMiddleware
     {
         $startTime = microtime(true);
 
-        // 记录请求开始
+        // Log request start
         mlog_with('request', 'info', 'Request started', [
             'url' => $request['url'] ?? '/unknown',
             'method' => $request['method'] ?? 'GET',
@@ -172,12 +172,12 @@ class RequestLoggingMiddleware
         ]);
 
         try {
-            // 处理请求
+            // Process request
             $response = $next($request);
 
             $duration = round((microtime(true) - $startTime) * 1000, 2);
 
-            // 记录请求完成
+            // Log request completion
             mlog_with('request', 'info', 'Request completed', [
                 'url' => $request['url'] ?? '/unknown',
                 'status' => $response['status'] ?? 200,
@@ -188,7 +188,7 @@ class RequestLoggingMiddleware
         } catch (Exception $e) {
             $duration = round((microtime(true) - $startTime) * 1000, 2);
 
-            // 记录请求失败
+            // Log request failure
             mlog_with('request', 'error', 'Request failed', [
                 'url' => $request['url'] ?? '/unknown',
                 'error' => $e->getMessage(),
@@ -200,8 +200,8 @@ class RequestLoggingMiddleware
     }
 }
 
-// 6. 队列任务示例
-echo "\n=== 队列任务使用示例 ===\n";
+// 6. Queue Job Example
+echo "\n=== Queue Job Usage Examples ===\n";
 
 class ProcessEmailJob
 {
@@ -213,8 +213,8 @@ class ProcessEmailJob
         ]);
 
         try {
-            // 模拟邮件发送
-            sleep(1); // 模拟处理时间
+            // Simulate email sending
+            sleep(1); // Simulate processing time
 
             if (mt_rand(1, 10) > 8) {
                 throw new Exception('Email service unavailable');
@@ -236,10 +236,10 @@ class ProcessEmailJob
     }
 }
 
-// 7. 运行示例
-echo "\n=== 运行示例 ===\n";
+// 7. Running Examples
+echo "\n=== Running Examples ===\n";
 
-// 创建服务实例（在实际 Laravel 应用中会通过容器自动注入）
+// Create service instance (in actual Laravel app, this would be auto-injected via container)
 $loggerFactory = new Mellivora\Logger\LoggerFactory([
     'default' => 'app',
     'formatters' => [
@@ -266,7 +266,7 @@ $loggerFactory = new Mellivora\Logger\LoggerFactory([
     ],
 ]);
 
-// 模拟 Laravel 容器绑定
+// Simulate Laravel container binding
 class MockApp
 {
     private static array $bindings = [];
@@ -284,7 +284,7 @@ class MockApp
 
 MockApp::bind(Mellivora\Logger\LoggerFactory::class, $loggerFactory);
 
-// 运行示例
+// Run examples
 $userService = new UserService($loggerFactory);
 $user = $userService->createUser(['name' => 'John Doe', 'email' => 'john@example.com']);
 echo 'Created user: ' . json_encode($user) . "\n";
@@ -308,4 +308,4 @@ try {
     echo 'Email job failed: ' . $e->getMessage() . "\n";
 }
 
-echo "\n=== 示例完成 ===\n";
+echo "\n=== Examples Completed ===\n";

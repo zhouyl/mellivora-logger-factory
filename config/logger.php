@@ -2,71 +2,71 @@
 
 declare(strict_types=1);
 
-// formatters - 用于最终输出日志消息的格式
+// formatters - Define the format for final log message output
 $formatters = [
-    // 简单消息输出
+    // Simple message output
     'simple' => [
         'class' => Monolog\Formatter\LineFormatter::class,
         'params' => [
             'format' => "[%datetime%][%level_name%] %message% %context%\n",
         ],
     ],
-    // 输出消息详情
+    // Verbose message output with details
     'venbose' => [
         'class' => Monolog\Formatter\LineFormatter::class,
         'params' => [
             'format' => "[%datetime%][%channel%][%level_name%] %message% %context% %extra%\n",
         ],
     ],
-    // JSON 格式输出，便于 ELK 收集
+    // JSON format output, convenient for ELK stack collection
     'json' => [
         'class' => Monolog\Formatter\JsonFormatter::class,
     ],
 ];
 
-// processors - 注册的 processor 将会附加在消息的 extra 字段中
+// processors - Registered processors will be attached to the extra field of messages
 $processors = [
-    // 用于日志输出所在 的 file, line, class, method, ...
+    // For logging file, line, class, method information where the log is output
     'intro' => [
         'class' => Monolog\Processor\IntrospectionProcessor::class,
         'params' => ['level' => 'ERROR', 'skipStackFramesCount' => 2],
     ],
 
-    // 用于捕获 http web 请求头信息
+    // For capturing HTTP web request header information
     'web' => [
         'class' => Mellivora\Logger\Processor\WebProcessor::class,
         'params' => ['level' => 'ERROR'],
     ],
 
-    // 用于捕获脚本运行信息
+    // For capturing script execution information
     'script' => [
         'class' => Mellivora\Logger\Processor\ScriptProcessor::class,
         'params' => ['level' => 'ERROR'],
     ],
 
-    // 用于时间成本分析
+    // For execution time cost analysis
     'cost' => [
         'class' => Mellivora\Logger\Processor\CostTimeProcessor::class,
         'params' => ['level' => 'DEBUG'],
     ],
 
-    // 用于内存使用情况分析
+    // For memory usage analysis
     'memory' => [
         'class' => Mellivora\Logger\Processor\MemoryProcessor::class,
         'params' => ['level' => 'ERROR'],
     ],
 ];
 
-// handlers - 用于消息输出方式的设定
+// handlers - Configuration for message output methods
 $handlers = [
     'file' => [
         'class' => 'Mellivora\Logger\Handler\NamedRotatingFileHandler',
         'params' => [
             'filename' => 'logs/%channel%.%date%.log',
-            'maxBytes' => 100000000, // 100Mb，文件最大尺寸
-            'backupCount' => 10, // 文件保留数量
-            'bufferSize' => 10, // 缓冲区大小(日志数量)
-            'dateFormat' => 'Y-m-d', // 日期格式
+            'maxBytes' => 100000000, // 100MB, maximum file size
+            'backupCount' => 10, // Number of backup files to retain
+            'bufferSize' => 10, // Buffer size (number of log entries)
+            'dateFormat' => 'Y-m-d', // Date format
             'level' => 'INFO',
         ],
         'formatter' => 'json',
@@ -103,7 +103,7 @@ $handlers = [
     ],
 ];
 
-// loggers -  当声明的 logger 不在以下列表中时，默认为 default
+// loggers - When a declared logger is not in the following list, it defaults to 'default'
 $loggers = [
     'default' => ['file', 'mail'],
     'cli' => ['cli', 'file', 'mail'],

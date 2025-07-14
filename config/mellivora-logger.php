@@ -10,8 +10,8 @@ return [
     | Default Logger Channel
     |--------------------------------------------------------------------------
     |
-    | 默认的日志通道名称。当调用 mlog() 函数而不指定通道时，
-    | 将使用此通道。
+    | The default log channel name. When calling the mlog() function without
+    | specifying a channel, this channel will be used.
     |
     */
     'default' => env('MELLIVORA_LOG_CHANNEL', 'app'),
@@ -21,7 +21,7 @@ return [
     | Formatters
     |--------------------------------------------------------------------------
     |
-    | 日志格式化器配置。定义如何格式化日志消息的输出格式。
+    | Log formatter configuration. Defines how to format the output of log messages.
     |
     */
     'formatters' => [
@@ -54,7 +54,8 @@ return [
     | Processors
     |--------------------------------------------------------------------------
     |
-    | 日志处理器配置。处理器用于在日志记录前添加额外的信息。
+    | Log processor configuration. Processors are used to add additional
+    | information before logging.
     |
     */
     'processors' => [
@@ -97,7 +98,8 @@ return [
     | Handlers
     |--------------------------------------------------------------------------
     |
-    | 日志处理器配置。定义日志的输出目标和处理方式。
+    | Log handler configuration. Defines the output targets and processing
+    | methods for logs.
     |
     */
     'handlers' => [
@@ -169,7 +171,8 @@ return [
     | Logger Channels
     |--------------------------------------------------------------------------
     |
-    | 日志通道配置。每个通道可以使用不同的处理器组合。
+    | Logger channel configuration. Each channel can use different combinations
+    | of handlers.
     |
     */
     'loggers' => [

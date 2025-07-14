@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 /**
  * MLog Facade.
  *
- * 提供 Laravel Facade 风格的日志访问接口
+ * Provides Laravel Facade-style logging access interface
  *
  * @method static LoggerInterface get(?string $channel = null)
  * @method static LoggerInterface make(string $channel, array|string|null $handlers = null)
@@ -27,13 +27,13 @@ use Psr\Log\LoggerInterface;
 class MLog extends Facade
 {
     /**
-     * 记录日志到默认通道.
+     * Log a message to the default channel.
      *
-     * @param Level|string $level 日志级别
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
+     * @param Level|string $level Log level
+     * @param string $message Log message
+     * @param array $context Context data
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     public static function log(string|Level $level, string $message, array $context = []): bool
     {

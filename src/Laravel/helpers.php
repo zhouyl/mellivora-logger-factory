@@ -9,13 +9,13 @@ use Psr\Log\LoggerInterface;
 
 if (!function_exists('mlog')) {
     /**
-     * 记录日志到默认通道.
+     * Log a message to the default channel.
      *
-     * @param Level|string $level 日志级别
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
+     * @param Level|string $level Log level
+     * @param string $message Log message
+     * @param array $context Context data
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     function mlog(string|Level $level, string $message, array $context = []): bool
     {
@@ -36,14 +36,14 @@ if (!function_exists('mlog')) {
 
 if (!function_exists('mlog_with')) {
     /**
-     * 记录日志到指定通道.
+     * Log a message to the specified channel.
      *
-     * @param string $channel 日志通道名称
-     * @param Level|string $level 日志级别
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
+     * @param string $channel Log channel name
+     * @param Level|string $level Log level
+     * @param string $message Log message
+     * @param array $context Context data
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     function mlog_with(
         string $channel,
@@ -69,11 +69,11 @@ if (!function_exists('mlog_with')) {
 
 if (!function_exists('mlogger')) {
     /**
-     * 获取指定通道的 Logger 实例.
+     * Get a Logger instance for the specified channel.
      *
-     * @param null|string $channel 日志通道名称，为 null 时返回默认通道
+     * @param null|string $channel Log channel name, returns default channel when null
      *
-     * @return LoggerInterface Logger 实例
+     * @return LoggerInterface Logger instance
      */
     function mlogger(?string $channel = null): LoggerInterface
     {
@@ -85,13 +85,13 @@ if (!function_exists('mlogger')) {
 
 if (!function_exists('mlog_debug')) {
     /**
-     * 记录 DEBUG 级别日志.
+     * Log a DEBUG level message.
      *
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
-     * @param null|string $channel 日志通道，为 null 时使用默认通道
+     * @param string $message Log message
+     * @param array $context Context data
+     * @param null|string $channel Log channel, uses default channel when null
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     function mlog_debug(string $message, array $context = [], ?string $channel = null): bool
     {
@@ -103,13 +103,13 @@ if (!function_exists('mlog_debug')) {
 
 if (!function_exists('mlog_info')) {
     /**
-     * 记录 INFO 级别日志.
+     * Log an INFO level message.
      *
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
-     * @param null|string $channel 日志通道，为 null 时使用默认通道
+     * @param string $message Log message
+     * @param array $context Context data
+     * @param null|string $channel Log channel, uses default channel when null
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     function mlog_info(string $message, array $context = [], ?string $channel = null): bool
     {
@@ -121,13 +121,13 @@ if (!function_exists('mlog_info')) {
 
 if (!function_exists('mlog_warning')) {
     /**
-     * 记录 WARNING 级别日志.
+     * Log a WARNING level message.
      *
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
-     * @param null|string $channel 日志通道，为 null 时使用默认通道
+     * @param string $message Log message
+     * @param array $context Context data
+     * @param null|string $channel Log channel, uses default channel when null
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     function mlog_warning(string $message, array $context = [], ?string $channel = null): bool
     {
@@ -139,13 +139,13 @@ if (!function_exists('mlog_warning')) {
 
 if (!function_exists('mlog_error')) {
     /**
-     * 记录 ERROR 级别日志.
+     * Log an ERROR level message.
      *
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
-     * @param null|string $channel 日志通道，为 null 时使用默认通道
+     * @param string $message Log message
+     * @param array $context Context data
+     * @param null|string $channel Log channel, uses default channel when null
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     function mlog_error(string $message, array $context = [], ?string $channel = null): bool
     {
@@ -157,13 +157,13 @@ if (!function_exists('mlog_error')) {
 
 if (!function_exists('mlog_critical')) {
     /**
-     * 记录 CRITICAL 级别日志.
+     * Log a CRITICAL level message.
      *
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
-     * @param null|string $channel 日志通道，为 null 时使用默认通道
+     * @param string $message Log message
+     * @param array $context Context data
+     * @param null|string $channel Log channel, uses default channel when null
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     function mlog_critical(
         string $message,
@@ -178,13 +178,13 @@ if (!function_exists('mlog_critical')) {
 
 if (!function_exists('mlog_exception')) {
     /**
-     * 记录异常日志.
+     * Log an exception.
      *
-     * @param Throwable $exception 异常对象
-     * @param Level|string $level 日志级别，默认为 Error
-     * @param null|string $channel 日志通道，为 null 时使用默认通道
+     * @param Throwable $exception Exception object
+     * @param Level|string $level Log level, defaults to Error
+     * @param null|string $channel Log channel, uses default channel when null
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     function mlog_exception(
         Throwable $exception,
