@@ -9,6 +9,7 @@ use Mellivora\Logger\Logger;
 use Mellivora\Logger\LoggerFactory;
 use Monolog\Level;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 /**
  * MLog Facade.
@@ -158,14 +159,14 @@ class MLog extends Facade
     /**
      * Log exception.
      *
-     * @param \Throwable $exception Exception object
+     * @param Throwable $exception Exception object
      * @param Level|string $level Log level, defaults to Error
      * @param null|string $channel Log channel, uses default channel when null
      *
      * @return bool Whether the log was successfully recorded
      */
     public static function exception(
-        \Throwable $exception,
+        Throwable $exception,
         string|Level $level = Level::Error,
         ?string $channel = null,
     ): bool {
