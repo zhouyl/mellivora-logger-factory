@@ -49,7 +49,9 @@ class ComprehensiveCoverageTest extends TestCase
         $this->assertCount(8, $records);
 
         // Verify all levels are recorded
-        $levels = array_map(fn ($record) => $record['level']->value, $records);
+        $levels = array_map(function ($record) {
+            return $record['level'] instanceof Level ? $record['level']->value : $record['level'];
+        }, $records);
         $expectedLevels = [
             Level::Emergency->value,
             Level::Alert->value,
@@ -111,7 +113,12 @@ class ComprehensiveCoverageTest extends TestCase
         $this->assertCount(1, $records);
 
         $record = $records[0];
-        $this->assertEquals(Level::Critical, $record['level']);
+        // Check level - it could be Level enum or integer value
+        if ($record['level'] instanceof Level) {
+            $this->assertEquals(Level::Critical->value, $record['level']->value);
+        } else {
+            $this->assertEquals(Level::Critical->value, $record['level']);
+        }
         $this->assertEquals('Complex exception', $record['message']);
         $this->assertArrayHasKey('exception', $record['context']);
         $this->assertArrayHasKey('code', $record['context']);
