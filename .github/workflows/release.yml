@@ -14,7 +14,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    
+
     name: Create Release
 
     steps:
@@ -32,7 +32,7 @@ jobs:
         tools: composer:v2
 
     - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-interaction --no-dev --optimize-autoloader
+      run: composer install --prefer-dist --no-progress --no-interaction
 
     - name: Run tests
       run: composer test
@@ -61,40 +61,39 @@ jobs:
         fi
 
     - name: Create Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ steps.tag.outputs.tag }}
-        release_name: Release ${{ steps.tag.outputs.tag }}
+        name: Release ${{ steps.tag.outputs.tag }}
         body: |
           ## Changes in ${{ steps.tag.outputs.tag }}
-          
+
           ${{ steps.changelog.outputs.changelog }}
-          
+
           ## Installation
-          
+
           ```bash
           composer require mellivora/logger-factory:${{ steps.tag.outputs.tag }}
           ```
-          
+
           ## Requirements
-          
+
           - PHP 8.3+
           - Monolog ^3.0
-          
+
           ## Documentation
-          
-          - [README](https://github.com/zhouyl/mellivora-logger-factory/blob/main/README.md)
-          - [Laravel Integration](https://github.com/zhouyl/mellivora-logger-factory/blob/main/docs/LARAVEL.md)
-          - [Testing Guide](https://github.com/zhouyl/mellivora-logger-factory/blob/main/docs/TESTING.md)
+
+          - [README](https://github.com/zhouyl/mellivora-logger-factory/blob/master/README.md)
+          - [Laravel Integration](https://github.com/zhouyl/mellivora-logger-factory/blob/master/docs/LARAVEL.md)
+          - [Testing Guide](https://github.com/zhouyl/mellivora-logger-factory/blob/master/docs/TESTING.md)
         draft: false
         prerelease: ${{ contains(steps.tag.outputs.tag, 'alpha') || contains(steps.tag.outputs.tag, 'beta') || contains(steps.tag.outputs.tag, 'rc') }}
+        token: ${{ secrets.GITHUB_TOKEN }}
 
   packagist:
     needs: release
     runs-on: ubuntu-latest
-    
+
     name: Update Packagist
 
     steps:
