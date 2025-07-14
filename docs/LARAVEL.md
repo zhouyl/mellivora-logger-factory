@@ -1,221 +1,204 @@
-# Laravel 集成指南
+# Laravel Integration Guide
 
-本文档详细介绍如何在 Laravel 项目中集成和使用 Mellivora Logger Factory。
+This document provides detailed instructions on how to integrate and use Mellivora Logger Factory in Laravel projects.
 
-## 📋 系统要求
+## 📋 System Requirements
 
 - **Laravel**: 10.x | 11.x
 - **PHP**: 8.3+
 - **Monolog**: ^3.0
 
-## 🚀 安装
+## 🚀 Installation
 
-### 1. 安装包
+### 1. Install Package
 
 ```bash
-composer require mellivora/logger-factory
+composer require mellivora/logger-factory:^2.0.0-alpha
 ```
 
-### 2. 自动发现
+### 2. Auto-Discovery
 
-Laravel 会自动发现并注册服务提供者，无需手动配置。
+Laravel will automatically discover and register the service provider, no manual configuration required.
 
-### 3. 发布配置文件
+### 3. Publish Configuration File
 
 ```bash
 php artisan vendor:publish --tag=mellivora-logger-config
 ```
 
-这将在 `config/mellivora-logger.php` 创建配置文件。
+This will create a configuration file at `config/mellivora-logger.php`.
 
-## ⚙️ 配置
+## ⚙️ Configuration
 
-### 基础配置
+### Basic Configuration
 
-编辑 `config/mellivora-logger.php`：
+Edit `config/mellivora-logger.php`:
 
 ```php
 <?php
 
-use Monolog\Level;
-
 return [
-    'default' => 'app',
+    /*
+    |--------------------------------------------------------------------------
+    | Default Log Channel
+    |--------------------------------------------------------------------------
+    |
+    | Default log channel name. When calling mlog() function without 
+    | specifying a channel, this channel will be used.
+    |
+    */
+    'default_channel' => env('MELLIVORA_LOG_CHANNEL', 'default'),
 
-    'formatters' => [
-        'json' => [
-            'class' => \Monolog\Formatter\JsonFormatter::class,
-            'params' => [],
-        ],
-        'line' => [
-            'class' => \Monolog\Formatter\LineFormatter::class,
-            'params' => [
-                'format' => "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n",
-                'dateFormat' => 'Y-m-d H:i:s',
-            ],
-        ],
-    ],
-
-    'processors' => [
-        'web' => [
-            'class' => \Mellivora\Logger\Processor\WebProcessor::class,
-            'params' => [
-                'level' => Level::Debug,
-            ],
-        ],
-        'memory' => [
-            'class' => \Mellivora\Logger\Processor\MemoryProcessor::class,
-            'params' => [
-                'level' => Level::Debug,
-                'realUsage' => true,
-                'useFormatting' => true,
-            ],
-        ],
-    ],
-
-    'handlers' => [
-        'daily' => [
-            'class' => \Mellivora\Logger\Handler\NamedRotatingFileHandler::class,
-            'params' => [
-                'filename' => storage_path('logs/%channel%.log'),
-                'maxBytes' => 10 * 1024 * 1024, // 10MB
-                'backupCount' => 5,
-                'level' => Level::Debug,
-            ],
-            'formatter' => 'line',
-            'processors' => ['web', 'memory'],
-        ],
-        'error_mail' => [
-            'class' => \Mellivora\Logger\Handler\SmtpHandler::class,
-            'params' => [
-                'mailer' => null, // 使用 Laravel 默认邮件配置
-                'message' => [
-                    'to' => env('LOG_ERROR_EMAIL', 'admin@example.com'),
-                    'subject' => 'Application Error',
+    /*
+    |--------------------------------------------------------------------------
+    | Log Channels
+    |--------------------------------------------------------------------------
+    |
+    | Configure different log channels for different purposes.
+    | Each channel can have multiple handlers.
+    |
+    */
+    'channels' => [
+        'default' => [
+            'handlers' => [
+                [
+                    'type' => 'rotating_file',
+                    'path' => storage_path('logs/mellivora.log'),
+                    'level' => env('MELLIVORA_LOG_LEVEL', 'debug'),
+                    'max_files' => 30,
                 ],
-                'level' => Level::Error,
-                'maxRecords' => 5,
             ],
-            'formatter' => 'json',
         ],
-    ],
 
-    'loggers' => [
-        'app' => ['daily'],
-        'api' => ['daily'],
-        'auth' => ['daily'],
-        'error' => ['daily', 'error_mail'],
+        'api' => [
+            'handlers' => [
+                [
+                    'type' => 'rotating_file',
+                    'path' => storage_path('logs/api.log'),
+                    'level' => 'info',
+                    'max_files' => 30,
+                ],
+            ],
+        ],
+
+        'queue' => [
+            'handlers' => [
+                [
+                    'type' => 'rotating_file',
+                    'path' => storage_path('logs/queue.log'),
+                    'level' => 'info',
+                    'max_files' => 30,
+                ],
+            ],
+        ],
     ],
 ];
 ```
 
-### 环境配置
+### Environment Variables
 
-在 `.env` 文件中添加相关配置：
+Add to your `.env` file:
 
 ```env
-# 日志配置
-LOG_ERROR_EMAIL=admin@example.com
-LOG_LEVEL=debug
+# Default log channel
+MELLIVORA_LOG_CHANNEL=default
 
-# 邮件配置（用于错误通知）
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.mailtrap.io
-MAIL_PORT=2525
-MAIL_USERNAME=your_username
-MAIL_PASSWORD=your_password
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=noreply@example.com
-MAIL_FROM_NAME="${APP_NAME}"
+# Default log level
+MELLIVORA_LOG_LEVEL=debug
+
+# Email handler configuration (optional)
+MELLIVORA_MAIL_TO=admin@example.com
+MELLIVORA_MAIL_FROM=noreply@example.com
+MELLIVORA_MAIL_SUBJECT="Application Error"
 ```
 
-## 📚 使用方法
+## 📖 Usage
 
-### 1. 依赖注入
+### Helper Functions
+
+The package provides convenient helper functions:
+
+#### Basic Logging
 
 ```php
 <?php
 
-namespace App\Http\Controllers;
+// Log to default channel
+mlog('info', 'User logged in', ['user_id' => 123]);
+mlog('error', 'Database connection failed');
 
-use Mellivora\Logger\LoggerFactory;
-use Illuminate\Http\Request;
-
-class UserController extends Controller
-{
-    public function __construct(
-        private LoggerFactory $loggerFactory
-    ) {}
-
-    public function index(Request $request)
-    {
-        $logger = $this->loggerFactory->get('api');
-        $logger->info('User list requested', [
-            'user_id' => $request->user()?->id,
-            'ip' => $request->ip(),
-        ]);
-
-        // 业务逻辑...
-    }
-}
-```
-
-### 2. Facade 使用
-
-```php
-<?php
-
-use Mellivora\Logger\Facades\MLog;
-
-// 使用默认通道
-MLog::info('Application started');
-
-// 使用指定通道
-MLog::logWith('api', 'debug', 'API request', [
+// Log to specific channel
+mlog_with('api', 'info', 'API request received', [
     'endpoint' => '/api/users',
     'method' => 'GET',
+    'ip' => request()->ip(),
 ]);
+```
 
-// 记录异常
+#### Level-Specific Functions
+
+```php
+<?php
+
+// Debug information
+mlog_debug('Processing user data', ['user_id' => 123]);
+
+// Info messages
+mlog_info('User action completed', ['action' => 'profile_update']);
+
+// Warning messages
+mlog_warning('High memory usage detected', ['memory' => memory_get_usage()]);
+
+// Error messages
+mlog_error('Payment processing failed', ['order_id' => 456]);
+
+// Critical errors
+mlog_critical('System is down', ['component' => 'database']);
+
+// Exception logging
 try {
-    // 业务逻辑
-} catch (\Exception $e) {
-    MLog::exception($e, 'error', 'error');
+    // Some operation that might fail
+    processPayment($order);
+} catch (Exception $e) {
+    mlog_exception($e, 'error', 'payment');
 }
 ```
 
-### 3. 辅助函数
+### Facade Usage
+
+Use the `MLog` facade for more advanced operations:
 
 ```php
 <?php
 
-// 快速日志记录
-mlog('info', 'User logged in', ['user_id' => 123]);
+use Mellivora\Logger\Laravel\Facades\MLog;
 
-// 指定通道
-mlog_with('auth', 'info', 'Login attempt', [
-    'username' => $username,
-    'success' => true,
+// Basic logging
+MLog::info('Application started');
+MLog::error('System error occurred', ['component' => 'auth']);
+
+// Channel-specific logging
+MLog::logWith('api', 'debug', 'API debug message', [
+    'request_id' => request()->header('X-Request-ID'),
+    'user_id' => auth()->id(),
 ]);
+
+// Exception logging with context
+MLog::exception($exception, 'warning', 'validation', [
+    'input' => $request->all(),
+    'rules' => $validator->getRules(),
+]);
+
+// Get logger instance
+$logger = MLog::getLogger('api');
+$logger->info('Direct logger usage');
 ```
 
-### 4. 服务容器
+## 🎯 Practical Examples
 
-```php
-<?php
+### API Request Logging
 
-// 在服务提供者中
-$logger = app('mellivora.logger.factory')->get('app');
-
-// 或者
-$logger = resolve(LoggerFactory::class)->get('api');
-```
-
-## 🔧 高级配置
-
-### 中间件集成
-
-创建日志中间件：
+Create a middleware for API request logging:
 
 ```php
 <?php
@@ -224,30 +207,31 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Mellivora\Logger\LoggerFactory;
 
-class RequestLogging
+class ApiRequestLogger
 {
-    public function __construct(
-        private LoggerFactory $loggerFactory
-    ) {}
-
     public function handle(Request $request, Closure $next)
     {
-        $logger = $this->loggerFactory->get('api');
-
         $startTime = microtime(true);
+        
+        // Log request start
+        mlog_with('api', 'info', 'API request started', [
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'user_id' => auth()->id(),
+        ]);
 
         $response = $next($request);
 
-        $duration = microtime(true) - $startTime;
-
-        $logger->info('HTTP Request', [
+        // Log request completion
+        mlog_with('api', 'info', 'API request completed', [
             'method' => $request->method(),
             'url' => $request->fullUrl(),
-            'status' => $response->getStatusCode(),
-            'duration' => round($duration * 1000, 2) . 'ms',
-            'user_id' => $request->user()?->id,
+            'status_code' => $response->getStatusCode(),
+            'duration' => round((microtime(true) - $startTime) * 1000, 2) . 'ms',
+            'user_id' => auth()->id(),
         ]);
 
         return $response;
@@ -255,44 +239,56 @@ class RequestLogging
 }
 ```
 
-注册中间件：
-
-```php
-// app/Http/Kernel.php
-protected $middleware = [
-    // ...
-    \App\Http\Middleware\RequestLogging::class,
-];
-```
-
-### 异常处理集成
-
-在 `app/Exceptions/Handler.php` 中：
+### Controller Usage
 
 ```php
 <?php
 
-namespace App\Exceptions;
+namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Mellivora\Logger\LoggerFactory;
-use Throwable;
+use Illuminate\Http\Request;
+use Mellivora\Logger\Laravel\Facades\MLog;
 
-class Handler extends ExceptionHandler
+class UserController extends Controller
 {
-    public function register(): void
+    public function store(Request $request)
     {
-        $this->reportable(function (Throwable $e) {
-            $loggerFactory = app(LoggerFactory::class);
-            $logger = $loggerFactory->get('error');
+        try {
+            mlog_with('api', 'info', 'Creating new user', [
+                'email' => $request->email,
+                'ip' => $request->ip(),
+            ]);
 
-            $logger->addException($e, \Monolog\Level::Error);
-        });
+            $user = User::create($request->validated());
+
+            mlog_with('api', 'info', 'User created successfully', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+            ]);
+
+            return response()->json($user, 201);
+
+        } catch (ValidationException $e) {
+            mlog_with('api', 'warning', 'User creation validation failed', [
+                'errors' => $e->errors(),
+                'input' => $request->all(),
+            ]);
+            
+            throw $e;
+
+        } catch (Exception $e) {
+            MLog::exception($e, 'error', 'api', [
+                'action' => 'user_creation',
+                'input' => $request->all(),
+            ]);
+
+            return response()->json(['error' => 'Internal server error'], 500);
+        }
     }
 }
 ```
 
-### 队列任务日志
+### Queue Job Logging
 
 ```php
 <?php
@@ -304,179 +300,226 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Mellivora\Logger\LoggerFactory;
 
-class ProcessDataJob implements ShouldQueue
+class ProcessEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function handle(LoggerFactory $loggerFactory): void
+    private array $emailData;
+
+    public function __construct(array $emailData)
     {
-        $logger = $loggerFactory->get('queue');
+        $this->emailData = $emailData;
+    }
 
-        $logger->info('Job started', [
-            'job_id' => $this->job->getJobId(),
-            'queue' => $this->job->getQueue(),
-        ]);
-
+    public function handle()
+    {
         try {
-            // 处理逻辑
-            $logger->info('Job completed successfully');
-        } catch (\Exception $e) {
-            $logger->addException($e);
+            mlog_with('queue', 'info', 'Email job started', [
+                'job' => 'ProcessEmailJob',
+                'email' => $this->emailData['to'] ?? 'unknown',
+                'queue' => $this->queue,
+            ]);
+
+            // Process email sending
+            $this->sendEmail($this->emailData);
+
+            mlog_with('queue', 'info', 'Email sent successfully', [
+                'job' => 'ProcessEmailJob',
+                'email' => $this->emailData['to'] ?? 'unknown',
+            ]);
+
+        } catch (Exception $e) {
+            mlog_with('queue', 'error', 'Email job failed', [
+                'job' => 'ProcessEmailJob',
+                'email' => $this->emailData['to'] ?? 'unknown',
+                'error' => $e->getMessage(),
+            ]);
+
             throw $e;
         }
     }
 }
 ```
 
-## 🎯 最佳实践
+## 🔧 Advanced Configuration
 
-### 1. 通道分离
-
-```php
-// 按功能模块分离日志通道
-'loggers' => [
-    'app' => ['daily'],           // 应用主日志
-    'api' => ['daily'],           // API 请求日志
-    'auth' => ['daily'],          // 认证相关日志
-    'payment' => ['daily'],       // 支付相关日志
-    'error' => ['daily', 'mail'], // 错误日志（同时发送邮件）
-    'audit' => ['daily'],         // 审计日志
-    'performance' => ['daily'],   // 性能监控日志
-],
-```
-
-### 2. 环境差异化配置
+### Custom Handlers
 
 ```php
+<?php
+
 // config/mellivora-logger.php
-$handlers = [
-    'daily' => [
-        'class' => \Mellivora\Logger\Handler\NamedRotatingFileHandler::class,
-        'params' => [
-            'filename' => storage_path('logs/%channel%.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-        ],
-    ],
-];
-
-// 生产环境添加邮件通知
-if (app()->environment('production')) {
-    $handlers['error_mail'] = [
-        'class' => \Mellivora\Logger\Handler\SmtpHandler::class,
-        'params' => [
-            'message' => [
-                'to' => env('LOG_ERROR_EMAIL'),
-                'subject' => 'Production Error Alert',
-            ],
-            'level' => \Monolog\Level::Error,
-        ],
-    ];
-}
 
 return [
-    'handlers' => $handlers,
-    // ...
+    'channels' => [
+        'custom' => [
+            'handlers' => [
+                // File handler
+                [
+                    'type' => 'rotating_file',
+                    'path' => storage_path('logs/custom.log'),
+                    'level' => 'info',
+                    'max_files' => 30,
+                ],
+                
+                // Email handler for critical errors
+                [
+                    'type' => 'native_mailer',
+                    'to' => env('MELLIVORA_MAIL_TO', 'admin@example.com'),
+                    'from' => env('MELLIVORA_MAIL_FROM', 'noreply@example.com'),
+                    'subject' => 'Critical Error Alert',
+                    'level' => 'critical',
+                ],
+                
+                // Slack handler (requires additional setup)
+                [
+                    'type' => 'slack',
+                    'token' => env('SLACK_TOKEN'),
+                    'channel' => env('SLACK_CHANNEL', '#alerts'),
+                    'level' => 'error',
+                ],
+            ],
+        ],
+    ],
 ];
 ```
 
-### 3. 性能优化
+### Custom Processors
 
 ```php
-// 使用缓冲减少 I/O
-'handlers' => [
-    'buffered_daily' => [
-        'class' => \Mellivora\Logger\Handler\NamedRotatingFileHandler::class,
-        'params' => [
-            'filename' => storage_path('logs/%channel%.log'),
-            'bufferSize' => 100, // 缓冲 100 条记录
+<?php
+
+// config/mellivora-logger.php
+
+return [
+    'channels' => [
+        'api' => [
+            'handlers' => [
+                [
+                    'type' => 'rotating_file',
+                    'path' => storage_path('logs/api.log'),
+                    'level' => 'info',
+                ],
+            ],
+            'processors' => [
+                'web_processor',      // Add web request information
+                'memory_processor',   // Add memory usage
+                'uid_processor',      // Add unique ID
+            ],
         ],
     ],
-],
+];
 ```
 
-## 🧪 测试
+## 🧪 Testing
 
-### 单元测试
+### Testing with Logs
 
 ```php
 <?php
 
 namespace Tests\Feature;
 
-use Mellivora\Logger\LoggerFactory;
 use Tests\TestCase;
+use Mellivora\Logger\Laravel\Facades\MLog;
 
-class LoggingTest extends TestCase
+class UserControllerTest extends TestCase
 {
-    public function test_logger_factory_is_available()
+    public function test_user_creation_logs_correctly()
     {
-        $factory = app(LoggerFactory::class);
-        $this->assertInstanceOf(LoggerFactory::class, $factory);
-    }
+        // Mock the logger to capture log calls
+        MLog::shouldReceive('logWith')
+            ->once()
+            ->with('api', 'info', 'Creating new user', \Mockery::type('array'));
 
-    public function test_can_log_to_different_channels()
-    {
-        $factory = app(LoggerFactory::class);
+        MLog::shouldReceive('logWith')
+            ->once()
+            ->with('api', 'info', 'User created successfully', \Mockery::type('array'));
 
-        $appLogger = $factory->get('app');
-        $apiLogger = $factory->get('api');
+        $response = $this->postJson('/api/users', [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+        ]);
 
-        $this->assertNotSame($appLogger, $apiLogger);
+        $response->assertStatus(201);
     }
 }
 ```
 
-### 功能测试
+## 🎯 Best Practices
+
+### 1. Channel Organization
+
+- **api**: API requests and responses
+- **queue**: Background job processing
+- **auth**: Authentication and authorization
+- **payment**: Payment processing
+- **default**: General application logs
+
+### 2. Log Levels
+
+- **debug**: Detailed debugging information
+- **info**: General information about application flow
+- **warning**: Warning conditions that should be noted
+- **error**: Error conditions that should be investigated
+- **critical**: Critical conditions requiring immediate attention
+
+### 3. Context Information
+
+Always include relevant context:
 
 ```php
-<?php
+mlog_with('api', 'info', 'User action', [
+    'user_id' => auth()->id(),
+    'action' => 'profile_update',
+    'ip' => request()->ip(),
+    'user_agent' => request()->userAgent(),
+    'timestamp' => now()->toISOString(),
+]);
+```
 
-namespace Tests\Feature;
+### 4. Exception Handling
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mellivora\Logger\Facades\MLog;
-use Tests\TestCase;
+Use structured exception logging:
 
-class ApiLoggingTest extends TestCase
-{
-    public function test_api_requests_are_logged()
-    {
-        // 模拟 API 请求
-        $response = $this->getJson('/api/users');
-
-        $response->assertStatus(200);
-
-        // 验证日志记录
-        // 注意：在测试环境中，可能需要使用 TestHandler 来验证日志
-    }
+```php
+try {
+    // Risky operation
+} catch (Exception $e) {
+    mlog_exception($e, 'error', 'payment', [
+        'order_id' => $order->id,
+        'amount' => $order->amount,
+        'payment_method' => $paymentMethod,
+    ]);
+    
+    throw $e; // Re-throw if needed
 }
 ```
 
-## 🔧 故障排除
+## 🔍 Troubleshooting
 
-### 常见问题
+### Common Issues
 
-1. **权限问题**
-   ```bash
-   sudo chown -R www-data:www-data storage/logs
-   sudo chmod -R 755 storage/logs
-   ```
+1. **Configuration not loaded**: Ensure you've published the config file
+2. **Permissions**: Check write permissions for log directories
+3. **Memory issues**: Use appropriate log levels to avoid excessive logging
+4. **Performance**: Consider using queued logging for high-traffic applications
 
-2. **配置缓存**
-   ```bash
-   php artisan config:clear
-   php artisan config:cache
-   ```
+### Debug Mode
 
-3. **邮件发送失败**
-   - 检查 `.env` 中的邮件配置
-   - 确认 SMTP 服务器连接正常
-   - 验证邮件地址格式
+Enable debug logging in development:
 
-## 📞 支持
+```env
+MELLIVORA_LOG_LEVEL=debug
+```
 
-- **Laravel 文档**: [Laravel Logging](https://laravel.com/docs/logging)
-- **问题反馈**: [GitHub Issues](https://github.com/zhouyl/mellivora-logger-factory/issues)
-- **讨论**: [GitHub Discussions](https://github.com/zhouyl/mellivora-logger-factory/discussions)
+## 📚 Additional Resources
+
+- [Main Documentation](../README.md)
+- [Testing Guide](TESTING.md)
+- [API Reference](API.md)
+
+---
+
+**Languages**: [English](LARAVEL.md) | [中文](zh-CN/LARAVEL.md)
