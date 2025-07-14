@@ -17,14 +17,14 @@ return $config
     ->setRules([
         '@PSR12' => true,
         '@PHP83Migration' => true,
-        
+
         // 数组格式化
         'array_syntax' => ['syntax' => 'short'],
         'array_indentation' => true,
         'trim_array_spaces' => true,
-        'no_trailing_comma_in_singleline_array' => true,
+        'no_trailing_comma_in_singleline' => true,
         'trailing_comma_in_multiline' => ['elements' => ['arrays', 'arguments', 'parameters']],
-        
+
         // 类和方法格式化
         'class_attributes_separation' => [
             'elements' => [
@@ -55,7 +55,7 @@ return $config
                 'method_private',
             ],
         ],
-        
+
         // 函数和方法参数
         'method_argument_space' => [
             'on_multiline' => 'ensure_fully_multiline',
@@ -64,7 +64,7 @@ return $config
         'function_declaration' => [
             'closure_function_spacing' => 'one',
         ],
-        
+
         // 行长度和换行
         'line_ending' => true,
         'no_extra_blank_lines' => [
@@ -72,16 +72,15 @@ return $config
                 'extra',
                 'throw',
                 'use',
-                'use_trait',
             ],
         ],
         'single_line_after_imports' => true,
         'no_unused_imports' => true,
-        
+
         // 字符串和引号
         'single_quote' => true,
-        'escape_implicit_backslashes' => true,
-        
+        'string_implicit_backslashes' => true,
+
         // 操作符
         'binary_operator_spaces' => [
             'default' => 'single_space',
@@ -92,13 +91,13 @@ return $config
         ],
         'concat_space' => ['spacing' => 'one'],
         'unary_operator_spaces' => true,
-        
+
         // 控制结构
         'no_alternative_syntax' => true,
         'no_superfluous_elseif' => true,
         'no_useless_else' => true,
         'switch_continue_to_break' => true,
-        
+
         // 注释和文档
         'comment_to_phpdoc' => true,
         'no_empty_comment' => true,
@@ -115,13 +114,13 @@ return $config
         'phpdoc_trim' => true,
         'phpdoc_types' => true,
         'phpdoc_var_without_name' => true,
-        
+
         // 类型声明
         'declare_strict_types' => true,
-        'native_function_type_declaration_casing' => true,
+        'native_type_declaration_casing' => true,
         'lowercase_cast' => true,
         'short_scalar_cast' => true,
-        
+
         // 其他格式化
         'no_leading_import_slash' => true,
         'no_trailing_whitespace' => true,
@@ -130,14 +129,14 @@ return $config
         'object_operator_without_whitespace' => true,
         'standardize_not_equals' => true,
         'ternary_operator_spaces' => true,
-        
+
         // 现代 PHP 特性
         'modernize_types_casting' => true,
         'no_alias_functions' => true,
         'random_api_migration' => true,
         'self_accessor' => true,
         'set_type_to_cast' => true,
-        
+
         // 安全和最佳实践
         'no_php4_constructor' => true,
         'no_unreachable_default_argument_value' => true,
