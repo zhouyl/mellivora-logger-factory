@@ -141,7 +141,7 @@ class NamedRotatingFileHandler extends StreamHandler
      */
     public function getFilename(string $channel = ''): string
     {
-        if ($this->dirCreated) {
+        if (!$this->dirCreated) {
             $logPath = dirname($this->filename);
 
             // @codeCoverageIgnoreStart

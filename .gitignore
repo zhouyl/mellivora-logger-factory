@@ -20,4 +20,9 @@ composer.lock
 /vendor
 /coverage
 coverage.xml
-/logs
+# Log files
+/logs/*.log
+/logs/*.txt
+/logs/**/*.log
+/logs/**/*.txt
+!/logs/.gitkeep

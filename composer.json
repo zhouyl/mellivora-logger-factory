@@ -26,14 +26,20 @@
         "psr/log": "^3.0"
     },
     "suggest": {
-        "illuminate/support": "^10.0|^11.0 - Required for Laravel integration",
-        "illuminate/console": "^10.0|^11.0 - Required for Laravel commands",
-        "illuminate/http": "^10.0|^11.0 - Required for Laravel middleware"
+        "illuminate/support": "^10.0|^11.0|^12.0 - Required for Laravel integration",
+        "illuminate/console": "^10.0|^11.0|^12.0 - Required for Laravel commands",
+        "illuminate/http": "^10.0|^11.0|^12.0 - Required for Laravel middleware"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.82",
         "phpunit/phpunit": "^11.0 || ^12.0",
-        "symfony/mailer": "^7.0"
+        "symfony/mailer": "^7.0",
+        "illuminate/support": "^10.0|^11.0|^12.0",
+        "illuminate/console": "^10.0|^11.0|^12.0",
+        "illuminate/http": "^10.0|^11.0|^12.0",
+        "illuminate/container": "^10.0|^11.0|^12.0",
+        "illuminate/config": "^10.0|^11.0|^12.0",
+        "phpoption/phpoption": "^1.9"
     },
     "autoload": {
         "psr-4": {

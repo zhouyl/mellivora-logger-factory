@@ -60,7 +60,7 @@ if (!function_exists('mlog_with')) {
             }
 
             return $logger->log($level, $message, $context);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             // Silent failure to avoid log recording errors affecting the application
             return false;
         }
