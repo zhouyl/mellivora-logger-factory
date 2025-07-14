@@ -79,6 +79,61 @@
 - **PSR-Log**: ^3.0
 - **Laravel**: ^10.0 | ^11.0 (可选，用于 Laravel 集成)
 
+## Installation
+
+Install the alpha version using Composer:
+
+```bash
+# Install alpha version
+composer require mellivora/logger-factory:^2.0.0-alpha
+
+# Or specify exact version
+composer require mellivora/logger-factory:2.0.0-alpha
+```
+
+> **Note**: Since this is an alpha version, you may need to set `"minimum-stability": "alpha"` in your composer.json or use the `--with-all-dependencies` flag.
+
+## Usage
+
+### Basic Usage
+
+```php
+<?php
+
+use Mellivora\Logger\LoggerFactory;
+use Monolog\Level;
+
+// Create factory instance
+$factory = new LoggerFactory();
+
+// Get default logger
+$logger = $factory->get();
+$logger->info('Hello World!');
+
+// Use specific channel
+$apiLogger = $factory->get('api');
+$apiLogger->debug('API request processed');
+```
+
+### Laravel Integration
+
+```php
+<?php
+
+// Using helper functions
+mlog('info', 'User logged in', ['user_id' => 123]);
+mlog_with('api', 'debug', 'API request');
+
+// Using Facade
+use Mellivora\Logger\Laravel\Facades\MLog;
+
+MLog::info('Application started');
+MLog::logWith('api', 'debug', 'API debug');
+MLog::exception($exception, 'error');
+```
+
+For complete Laravel integration guide, see [Laravel Documentation](docs/LARAVEL.md).
+
 ## 🚀 快速开始
 
 ### 安装
