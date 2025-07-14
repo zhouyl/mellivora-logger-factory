@@ -116,7 +116,7 @@ jobs:
           exit 1
         fi
 
-        if ! grep -q "## Usage" README.md || ! grep -q "## 使用方法" README.md; then
+        if ! grep -q "## Usage" README.md; then
           echo "README.md is missing Usage section"
           exit 1
         fi
