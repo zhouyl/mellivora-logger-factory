@@ -42,14 +42,14 @@ class MLog extends Facade
     }
 
     /**
-     * 记录日志到指定通道.
+     * Log message to specified channel.
      *
-     * @param string $channel 日志通道名称
-     * @param Level|string $level 日志级别
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
+     * @param string $channel Log channel name
+     * @param Level|string $level Log level
+     * @param string $message Log message
+     * @param array $context Context data
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     public static function logWith(
         string $channel,
