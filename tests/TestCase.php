@@ -7,9 +7,9 @@ namespace Mellivora\Logger\Tests;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 /**
- * 在这里对单元测试进行初始化设置.
+ * Initialize unit test settings here.
  *
- * 例如时区设置等
+ * For example, timezone settings, etc.
  */
 abstract class TestCase extends PHPUnitTestCase
 {

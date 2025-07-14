@@ -120,12 +120,12 @@ class LogRequestMiddleware
     }
 
     /**
-     * 根据状态码确定日志级别.
+     * Determine log level based on status code.
      *
-     * @param int $statusCode HTTP 状态码
-     * @param string $defaultLevel 默认日志级别
+     * @param int $statusCode HTTP status code
+     * @param string $defaultLevel Default log level
      *
-     * @return string 日志级别
+     * @return string Log level
      */
     protected function getResponseLevel(int $statusCode, string $defaultLevel): string
     {
@@ -166,11 +166,11 @@ class LogRequestMiddleware
     }
 
     /**
-     * 过滤敏感的请求体数据.
+     * Filter sensitive request body data.
      *
-     * @param Request $request HTTP 请求对象
+     * @param Request $request HTTP request object
      *
-     * @return array 过滤后的请求体数据
+     * @return array Filtered request body data
      */
     protected function filterRequestBody(Request $request): array
     {
@@ -196,11 +196,11 @@ class LogRequestMiddleware
     }
 
     /**
-     * 格式化字节数为可读字符串.
+     * Format bytes to readable string.
      *
-     * @param int $bytes 字节数
+     * @param int $bytes Number of bytes
      *
-     * @return string 格式化后的字符串
+     * @return string Formatted string
      */
     protected function formatBytes(int $bytes): string
     {

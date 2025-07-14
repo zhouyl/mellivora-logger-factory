@@ -61,13 +61,13 @@ class MLog extends Facade
     }
 
     /**
-     * 记录 DEBUG 级别日志.
+     * Log DEBUG level message.
      *
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
-     * @param null|string $channel 日志通道，为 null 时使用默认通道
+     * @param string $message Log message
+     * @param array $context Context data
+     * @param null|string $channel Log channel, uses default channel when null
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     public static function debug(
         string $message,
@@ -80,13 +80,13 @@ class MLog extends Facade
     }
 
     /**
-     * 记录 INFO 级别日志.
+     * Log INFO level message.
      *
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
-     * @param null|string $channel 日志通道，为 null 时使用默认通道
+     * @param string $message Log message
+     * @param array $context Context data
+     * @param null|string $channel Log channel, uses default channel when null
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     public static function info(
         string $message,
@@ -99,13 +99,13 @@ class MLog extends Facade
     }
 
     /**
-     * 记录 WARNING 级别日志.
+     * Log WARNING level message.
      *
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
-     * @param null|string $channel 日志通道，为 null 时使用默认通道
+     * @param string $message Log message
+     * @param array $context Context data
+     * @param null|string $channel Log channel, uses default channel when null
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     public static function warning(
         string $message,
@@ -118,13 +118,13 @@ class MLog extends Facade
     }
 
     /**
-     * 记录 ERROR 级别日志.
+     * Log ERROR level message.
      *
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
-     * @param null|string $channel 日志通道，为 null 时使用默认通道
+     * @param string $message Log message
+     * @param array $context Context data
+     * @param null|string $channel Log channel, uses default channel when null
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     public static function error(
         string $message,
@@ -137,13 +137,13 @@ class MLog extends Facade
     }
 
     /**
-     * 记录 CRITICAL 级别日志.
+     * Log CRITICAL level message.
      *
-     * @param string $message 日志消息
-     * @param array $context 上下文数据
-     * @param null|string $channel 日志通道，为 null 时使用默认通道
+     * @param string $message Log message
+     * @param array $context Context data
+     * @param null|string $channel Log channel, uses default channel when null
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     public static function critical(
         string $message,
@@ -156,13 +156,13 @@ class MLog extends Facade
     }
 
     /**
-     * 记录异常日志.
+     * Log exception.
      *
-     * @param \Throwable $exception 异常对象
-     * @param Level|string $level 日志级别，默认为 Error
-     * @param null|string $channel 日志通道，为 null 时使用默认通道
+     * @param \Throwable $exception Exception object
+     * @param Level|string $level Log level, defaults to Error
+     * @param null|string $channel Log channel, uses default channel when null
      *
-     * @return bool 是否成功记录
+     * @return bool Whether the log was successfully recorded
      */
     public static function exception(
         \Throwable $exception,
@@ -175,7 +175,7 @@ class MLog extends Facade
             return $logger->addException($exception, $level);
         }
 
-        // 回退到标准日志记录
+        // Fall back to standard logging
         $context = [
             'exception' => get_class($exception),
             'code' => $exception->getCode(),
@@ -188,11 +188,11 @@ class MLog extends Facade
     }
 
     /**
-     * 获取指定通道的 Logger 实例.
+     * Get Logger instance for specified channel.
      *
-     * @param null|string $channel 日志通道名称
+     * @param null|string $channel Log channel name
      *
-     * @return LoggerInterface Logger 实例
+     * @return LoggerInterface Logger instance
      */
     public static function channel(?string $channel = null): LoggerInterface
     {
@@ -200,7 +200,7 @@ class MLog extends Facade
     }
 
     /**
-     * 获取组件的注册名称.
+     * Get the registered name of the component.
      */
     protected static function getFacadeAccessor(): string
     {
