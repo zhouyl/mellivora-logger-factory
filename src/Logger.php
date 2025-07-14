@@ -14,35 +14,35 @@ use Throwable;
 use UnhandledMatchError;
 
 /**
- * 日志类扩展 - 基于 Monolog 的自定义 Logger 实现.
+ * Logger class extension - Custom Logger implementation based on Monolog.
  *
- * 提供了额外的功能：
- * - 全局日志级别控制
- * - 过滤器支持
- * - Handler 管理方法
- * - 异常日志记录
+ * Provides additional functionality:
+ * - Global log level control
+ * - Filter support
+ * - Handler management methods
+ * - Exception logging
  */
 class Logger extends MonoLogger
 {
     /**
-     * 过滤器数组，用于在记录日志前进行自定义过滤.
+     * Filter array for custom filtering before logging.
      *
      * @var array<callable(Level, string, array): bool>
      */
     protected array $filters = [];
 
     /**
-     * 当前 Logger 的日志级别，低于此级别的日志将被忽略.
+     * Current Logger's log level, logs below this level will be ignored.
      */
     protected Level $level;
 
     /**
-     * 构造函数.
+     * Constructor.
      *
-     * @param string $name Logger 名称
-     * @param array $handlers Handler 数组
-     * @param array $processors Processor 数组
-     * @param null|DateTimeZone $timezone 时区设置
+     * @param string $name Logger name
+     * @param array $handlers Handler array
+     * @param array $processors Processor array
+     * @param null|DateTimeZone $timezone Timezone setting
      */
     public function __construct(
         string        $name,

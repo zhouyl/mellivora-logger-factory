@@ -14,38 +14,38 @@ use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Email;
 
 /**
- * SMTP 邮件处理器.
+ * SMTP Email Handler.
  *
- * 通过 Symfony Mailer 发送日志邮件，支持 SMTP 协议。
- * 当日志记录数量达到指定阈值时，会自动发送邮件通知。
+ * Sends log emails via Symfony Mailer with SMTP protocol support.
+ * Automatically sends email notifications when log record count reaches specified threshold.
  *
- * 特性：
- * - 支持批量发送（达到指定记录数时发送）
- * - 支持 SMTP 认证
- * - 自动格式化日志内容
- * - 支持多个收件人
+ * Features:
+ * - Support for batch sending (sends when specified record count is reached)
+ * - Support for SMTP authentication
+ * - Automatic log content formatting
+ * - Support for multiple recipients
  */
 class SmtpHandler extends AbstractProcessingHandler
 {
     /**
-     * Symfony Mailer 实例.
+     * Symfony Mailer instance.
      */
     protected Mailer $mailer;
 
     /**
-     * 日志消息缓冲.
+     * Log message buffer.
      *
      * @var array<LogRecord>
      */
     protected array $records = [];
 
     /**
-     * 触发邮件发送的最大记录数.
+     * Maximum number of records that triggers email sending.
      */
     protected int $maxRecords = 10;
 
     /**
-     * SMTP 服务器配置.
+     * SMTP server configuration.
      *
      * @var array{host: string, port: int, username: null|string, password: null|string}
      */
@@ -57,39 +57,39 @@ class SmtpHandler extends AbstractProcessingHandler
     ];
 
     /**
-     * 发件人地址
+     * Sender email address
      */
     protected string $sender;
 
     /**
-     * 收件人地址列表.
+     * List of recipient email addresses.
      *
      * @var array<string>
      */
     protected array $receivers;
 
     /**
-     * 邮件主题.
+     * Email subject.
      */
     protected string $subject;
 
     /**
-     * 构造函数.
+     * Constructor.
      *
-     * @param string $sender 发件人地址，格式：email 或 "Name <email>"
-     * @param array<string>|string $receivers 收件人地址或地址列表
-     * @param string $subject 邮件主题
+     * @param string $sender Sender email address, format: email or "Name <email>"
+     * @param array<string>|string $receivers Recipient address or address list
+     * @param string $subject Email subject
      * @param array{
      *     host?: string,
      *     port?: int,
      *     username?: string,
      *     password?: string
-     * } $certificates SMTP 服务器配置
-     * @param int $maxRecords 触发邮件发送的最大记录数
-     * @param int|Level $level 最低日志级别
-     * @param bool $bubble 是否向上传递日志记录
+     * } $certificates SMTP server configuration
+     * @param int $maxRecords Maximum number of records that triggers email sending
+     * @param int|Level $level Minimum log level
+     * @param bool $bubble Whether to bubble log records up
      *
-     * @throws Exception 当 Symfony Mailer 组件不存在时抛出异常
+     * @throws Exception When Symfony Mailer component is not available
      */
     public function __construct(
         string $sender,
@@ -126,11 +126,11 @@ class SmtpHandler extends AbstractProcessingHandler
             $certificates['port'],
         );
 
-        // 创建 Mailer 实例
+        // Create Mailer instance
         $transport = Transport::fromDsn($dsn);
         $this->mailer = new Mailer($transport);
 
-        // 存储配置
+        // Store configuration
         $this->sender = $sender;
         $this->receivers = is_array($receivers) ? $receivers : [$receivers];
         $this->subject = $subject;
@@ -143,8 +143,8 @@ class SmtpHandler extends AbstractProcessingHandler
     }
 
     /**
-     * 解析邮件地址，支持对以下格式进行正确解析
-     * 解析结果将返回一个数组，内容分别为 [邮件地址，发/收件人名称].
+     * Parse email address, supports correct parsing of the following formats.
+     * The parsing result will return an array containing [email address, sender/recipient name].
      *
      * - name <my@mailhost.com>
      * - my@mailhost.com
@@ -159,14 +159,14 @@ class SmtpHandler extends AbstractProcessingHandler
      */
     protected function parseAddress(string $address): array
     {
-        // 识别 "name <my@mailhost.com>" 类似的格式
+        // Recognize "name <my@mailhost.com>" format
         preg_match('/^(.+)<([a-z0-9][\w\.\-]+@[\w\-]+(\.\w+)+)>$/i', $address, $matches);
 
         if (count($matches) === 4) {
             return [trim($matches[2]), trim($matches[1])];
         }
 
-        // 验证是否有效的 email 格式
+        // Validate if it's a valid email format
         $pattern = '/^
             [-_a-z0-9\'+*$^&%=~!?{}]++
             (?:\.[-_a-z0-9\'+*$^&%=~!?{}]+)*+

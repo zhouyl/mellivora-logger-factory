@@ -13,10 +13,11 @@ use UnhandledMatchError;
 use ValueError;
 
 /**
- * 日志工厂类 - 通过参数配置来管理项目的日志.
+ * Logger Factory Class - Manages project logging through parameter configuration.
  *
- * 提供了基于配置的日志管理功能，支持多种 Handler、Formatter 和 Processor 的组合配置。
- * 实现了 ArrayAccess 接口，可以像数组一样访问 Logger 实例。
+ * Provides configuration-based log management functionality, supporting various combinations
+ * of Handlers, Formatters, and Processors. Implements ArrayAccess interface for array-like
+ * access to Logger instances.
  */
 class LoggerFactory implements \ArrayAccess
 {

@@ -11,94 +11,94 @@ use Monolog\LogRecord;
 use UnexpectedValueException;
 
 /**
- * 命名轮转文件处理器.
+ * Named Rotating File Handler.
  *
- * 根据 Logger 的通道名称生成不同的日志文件，并支持自动轮转功能。
- * 文件名格式：{basename}-{channel}-{date}.{extension}
+ * Generates different log files based on Logger channel names and supports automatic rotation.
+ * File name format: {basename}-{channel}-{date}.{extension}
  *
- * 特性：
- * - 按通道名称分离日志文件
- * - 按日期自动轮转
- * - 支持文件大小限制
- * - 支持备份文件数量限制
- * - 支持缓冲写入
+ * Features:
+ * - Separate log files by channel name
+ * - Automatic rotation by date
+ * - Support for file size limits
+ * - Support for backup file count limits
+ * - Support for buffered writing
  *
  * @example
  * ```php
  * $logger = new Logger('order');
  * $logger->pushHandler(new NamedRotatingFileHandler('/tmp/app.log'));
  * $logger->info('hello');
- * // 将生成 /tmp/app-order-2024-01-01.log 文件
+ * // Will generate /tmp/app-order-2024-01-01.log file
  * ```
  */
 class NamedRotatingFileHandler extends StreamHandler
 {
     /**
-     * 日志文件名模板
+     * Log file name template
      */
     protected string $filename;
 
     /**
-     * 单个文件最大字节数.
+     * Maximum bytes per file.
      */
     protected int $maxBytes;
 
     /**
-     * 备份文件数量.
+     * Number of backup files.
      */
     protected int $backupCount;
 
     /**
-     * 缓冲区大小（记录数）.
+     * Buffer size (number of records).
      */
     protected int $bufferSize;
 
     /**
-     * 日期格式字符串.
+     * Date format string.
      */
     protected string $dateFormat;
 
     /**
-     * 文件流缓存，按文件路径存储.
+     * File stream cache, stored by file path.
      *
      * @var array<string, resource>
      */
     private array $streams = [];
 
     /**
-     * 日志记录缓冲区，按通道名称存储.
+     * Log record buffer, stored by channel name.
      *
      * @var array<string, array>
      */
     private array $buffers = [];
 
     /**
-     * 当前处理的通道名称.
+     * Currently processing channel name.
      */
     private ?string $current = null;
 
     /**
-     * 目录是否已创建的标记.
+     * Flag indicating whether directory has been created.
      */
     private bool $dirCreated = false;
 
     /**
-     * 是否已初始化.
+     * Whether initialization has been completed.
      */
     private bool $initialized = false;
 
     /**
-     * 构造函数.
+     * Constructor.
      *
-     * @param string $filename 日志文件名模板，支持相对路径和绝对路径
-     * @param int $maxBytes 单个日志文件最大字节数，默认 100MB，0 表示不限制
-     * @param int $backupCount 保留的备份文件数量，默认 10 个，0 表示不保留备份
-     * @param int $bufferSize 缓冲区大小（记录数），默认 0 表示不使用缓冲
-     * @param string $dateFormat 日期格式字符串，用于生成文件名中的日期部分
-     * @param int|Level $level 最低日志级别
-     * @param bool $bubble 是否向上传递日志记录
-     * @param null|int $filePermission 文件权限，null 使用系统默认
-     * @param bool $useLocking 是否使用文件锁
+     * @param string $filename Log file name template, supports relative and absolute paths
+     * @param int $maxBytes Maximum bytes per log file, default 100MB, 0 means no limit
+     * @param int $backupCount Number of backup files to retain, default 10, 0 means no backup
+     * @param int $bufferSize Buffer size (number of records), default 0 means no buffering
+     * @param string $dateFormat Date format string for generating date part in filename
+     * @param int|Level $level Minimum log level
+     * @param bool $bubble Whether to bubble log records up
+     * @param null|int $filePermission File permission, null uses system default
+     * @param bool $useLocking Whether to use file locking
      */
     public function __construct(
         string $filename,
@@ -111,7 +111,7 @@ class NamedRotatingFileHandler extends StreamHandler
         ?int $filePermission = null,
         bool $useLocking = false,
     ) {
-        // 处理相对路径
+        // Handle relative paths
         if (!str_starts_with($filename, '/') && !str_starts_with($filename, 'file://')) {
             $rootPath = LoggerFactory::getRootPath();
             $filename = $rootPath ? $rootPath . '/' . $filename : $filename;
@@ -133,7 +133,7 @@ class NamedRotatingFileHandler extends StreamHandler
     }
 
     /**
-     * 根据 logger channel 获取当前日志文件名.
+     * Get current log filename based on logger channel.
      *
      * @param string $channel
      *
@@ -197,7 +197,7 @@ class NamedRotatingFileHandler extends StreamHandler
     }
 
     /**
-     * 刷新缓冲数据到日志文件.
+     * Flush buffered data to log file.
      *
      * @param string|null $channel
      */
@@ -255,18 +255,18 @@ class NamedRotatingFileHandler extends StreamHandler
         parent::write($record);
         // @codeCoverageIgnoreEnd
 
-        // add to stream buffer
+        // Add to stream buffer
         $this->streams[$this->url] = $this->stream;
         $this->current = $channel;
 
-        // rotates the files
+        // Rotate the files
         // @codeCoverageIgnoreStart
         $this->rotate();
         // @codeCoverageIgnoreEnd
     }
 
     /**
-     * 日志分片备份，仅保留指定数量.
+     * Log file rotation backup, only keep specified number.
      */
     protected function rotate(): void
     {
@@ -287,19 +287,18 @@ class NamedRotatingFileHandler extends StreamHandler
         // @codeCoverageIgnoreEnd
         $this->stream = null;
 
-        // matching all log files
-        $fileInfo = pathinfo($this->url);
+        // Match all log files
         $baseFile = "{$this->url}.";
         $logFiles = glob("{$this->url}.*");
 
-        // sorting the files by name to remove or rename the older ones
+        // Sort the files by name to remove or rename the older ones
         // @codeCoverageIgnoreStart
         usort($logFiles, function ($a, $b) {
             return strcmp($b, $a);
         });
         /** @codeCoverageIgnoreEnd */
 
-        // remove the older files
+        // Remove the older files
         $offset = count($logFiles) - $this->backupCount + 1;
         if ($this->backupCount && $offset > 0) {
             // @codeCoverageIgnoreStart
@@ -310,7 +309,7 @@ class NamedRotatingFileHandler extends StreamHandler
             $logFiles = array_slice($logFiles, $offset);
         }
 
-        // rename the older files
+        // Rename the older files
         // @codeCoverageIgnoreStart
         for ($i = count($logFiles); $i > 0; --$i) {
             $this->rename($baseFile . $i, $baseFile . ($i + 1));
