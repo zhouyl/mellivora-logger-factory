@@ -480,3 +480,7 @@ class ApiLoggingTest extends TestCase
 - **Laravel 文档**: [Laravel Logging](https://laravel.com/docs/logging)
 - **问题反馈**: [GitHub Issues](https://github.com/zhouyl/mellivora-logger-factory/issues)
 - **讨论**: [GitHub Discussions](https://github.com/zhouyl/mellivora-logger-factory/discussions)
+
+---
+
+**Languages**: [English](../LARAVEL.md) | [中文](LARAVEL.md)

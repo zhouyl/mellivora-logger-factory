@@ -344,3 +344,7 @@ public function __invoke(LogRecord $record): LogRecord
 2. 确保所有依赖都已正确更新
 3. 查看此升级指南中的迁移说明
 4. 在 GitHub 上提交 issue
+
+---
+
+**Languages**: [English](../../UPGRADE.md) | [中文](UPGRADE.md)

@@ -1518,4 +1518,10 @@ composer phpcs-fix
 
 ## 📄 许可证
 
-本项目基于 [MIT 许可证](LICENSE) 开源。
+本项目基于 [MIT 许可证](../../LICENSE) 开源。
+
+---
+
+**Languages**: [English](../../README.md) | [中文](README.md)
+
+*Made with ❤️ and AI assistance*

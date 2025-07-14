@@ -189,3 +189,7 @@ $scriptPath = shell_exec("readlink /proc/$pid/exe 2>/dev/null");
 - ✅ 为后续开发和维护提供了坚实的测试基础
 
 这个覆盖率水平已经达到了工业级标准，为项目的长期维护和发展提供了可靠保障。
+
+---
+
+**Languages**: [English](../TESTING.md) | [中文](TESTING.md)
