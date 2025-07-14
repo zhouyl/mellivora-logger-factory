@@ -25,28 +25,28 @@ use ValueError;
 class LoggerFactory implements ArrayAccess
 {
     /**
-     * 项目根目录路径，用于辅助日志文件定位.
+     * Project root directory path, used to assist log file location.
      */
     protected static ?string $rootPath = null;
 
     /**
-     * 默认 Logger 通道名称.
+     * Default Logger channel name.
      */
     protected ?string $default = null;
 
     /**
-     * Formatter 配置数组.
+     * Formatter configuration array.
      *
-     * 格式: ['formatter_name' => ['class' => 'ClassName', 'params' => [...]]]
+     * Format: ['formatter_name' => ['class' => 'ClassName', 'params' => [...]]]
      *
      * @var array<string, array{class: string, params?: array}>
      */
     protected array $formatters = [];
 
     /**
-     * Processor 配置数组.
+     * Processor configuration array.
      *
-     * 格式: ['processor_name' => ['class' => 'ClassName', 'params' => [...]]]
+     * Format: ['processor_name' => ['class' => 'ClassName', 'params' => [...]]]
      *
      * @var array<string, array{class: string, params?: array}>
      */
@@ -110,11 +110,11 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * 设置项目根目录.
+     * Set project root directory.
      *
-     * @param string $path 项目根目录路径
+     * @param string $path Project root directory path
      *
-     * @throws InvalidArgumentException 当路径无效时抛出异常
+     * @throws InvalidArgumentException When path is invalid
      */
     public static function setRootPath(string $path): void
     {
@@ -127,11 +127,11 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * 获取项目根目录.
+     * Get project root directory.
      *
-     * 如果未设置根目录，会自动尝试查找包含 vendor 目录的路径作为根目录
+     * If root directory is not set, will automatically try to find path containing vendor directory as root
      *
-     * @return null|string 项目根目录路径，未找到时返回 null
+     * @return null|string Project root directory path, returns null if not found
      */
     public static function getRootPath(): ?string
     {
@@ -149,11 +149,11 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * 根据配置数组创建 LoggerFactory 实例.
+     * Create LoggerFactory instance from configuration array.
      *
-     * @param array $config 日志配置数组，包含 formatters、processors、handlers、loggers 等配置
+     * @param array $config Log configuration array, containing formatters, processors, handlers, loggers etc.
      *
-     * @return self LoggerFactory 实例
+     * @return self LoggerFactory instance
      */
     public static function build(array $config): self
     {
@@ -161,13 +161,13 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * 根据 PHP 配置文件创建 LoggerFactory 实例.
+     * Create LoggerFactory instance from PHP configuration file.
      *
-     * @param string $configFile PHP 配置文件路径，必须是 .php 文件
+     * @param string $configFile PHP configuration file path, must be .php file
      *
-     * @throws InvalidArgumentException 当配置文件不存在、格式不正确或内容无效时抛出异常
+     * @throws InvalidArgumentException When config file doesn't exist, format is incorrect or content is invalid
      *
-     * @return self LoggerFactory 实例
+     * @return self LoggerFactory instance
      */
     public static function buildWith(string $configFile): self
     {
@@ -193,13 +193,13 @@ class LoggerFactory implements ArrayAccess
     }
 
     /**
-     * 设置默认 Logger 通道名称.
+     * Set default Logger channel name.
      *
-     * @param string $default Logger 通道名称，必须在配置中已定义
+     * @param string $default Logger channel name, must be defined in configuration
      *
-     * @throws RuntimeException 当指定的 Logger 通道未定义时抛出异常
+     * @throws RuntimeException When specified Logger channel is not defined
      *
-     * @return self 返回当前实例以支持链式调用
+     * @return self Returns current instance to support method chaining
      */
     public function setDefault(string $default): self
     {

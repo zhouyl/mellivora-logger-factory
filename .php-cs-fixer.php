@@ -9,7 +9,7 @@ $finder = PhpCsFixer\Finder::create()
     ->name('*.php')
     ->notPath('vendor');
 
-// 只有当 examples 目录存在时才包含它
+// Only include examples directory when it exists
 if (is_dir(__DIR__ . '/examples')) {
     $finder->in(__DIR__ . '/examples');
 }
@@ -22,14 +22,14 @@ return $config
         '@PSR12' => true,
         '@PHP83Migration' => true,
 
-        // 数组格式化
+        // Array formatting
         'array_syntax' => ['syntax' => 'short'],
         'array_indentation' => true,
         'trim_array_spaces' => true,
         'no_trailing_comma_in_singleline' => true,
         'trailing_comma_in_multiline' => ['elements' => ['arrays', 'arguments', 'parameters']],
 
-        // 类和方法格式化
+        // Class and method formatting
         'class_attributes_separation' => [
             'elements' => [
                 'method' => 'one',
@@ -60,7 +60,7 @@ return $config
             ],
         ],
 
-        // 函数和方法参数
+        // Function and method parameters
         'method_argument_space' => [
             'on_multiline' => 'ensure_fully_multiline',
             'keep_multiple_spaces_after_comma' => false,
@@ -81,7 +81,7 @@ return $config
         'single_line_after_imports' => true,
         'no_unused_imports' => true,
 
-        // 字符串和引号
+        // Strings and quotes
         'single_quote' => true,
         'string_implicit_backslashes' => true,
 
@@ -125,7 +125,7 @@ return $config
         'lowercase_cast' => true,
         'short_scalar_cast' => true,
 
-        // 其他格式化
+        // Other formatting
         'no_leading_import_slash' => true,
         'no_trailing_whitespace' => true,
         'no_trailing_whitespace_in_comment' => true,

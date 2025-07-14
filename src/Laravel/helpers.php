@@ -28,7 +28,7 @@ if (!function_exists('mlog')) {
 
             return $logger->log($level, $message, $context);
         } catch (Throwable $e) {
-            // 静默失败，避免日志记录错误影响应用程序
+            // Silent failure to avoid log recording errors affecting the application
             return false;
         }
     }
@@ -61,7 +61,7 @@ if (!function_exists('mlog_with')) {
 
             return $logger->log($level, $message, $context);
         } catch (Throwable $e) {
-            // 静默失败，避免日志记录错误影响应用程序
+            // Silent failure to avoid log recording errors affecting the application
             return false;
         }
     }
@@ -198,7 +198,7 @@ if (!function_exists('mlog_exception')) {
                 return $logger->addException($exception, $level);
             }
 
-            // 回退到标准日志记录
+            // Fall back to standard logging
             $context = [
                 'exception' => get_class($exception),
                 'code' => $exception->getCode(),

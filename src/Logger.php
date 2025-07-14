@@ -146,17 +146,17 @@ class Logger extends MonoLogger
     }
 
     /**
-     * 添加一个过滤器.
+     * Add a filter.
      *
-     * 过滤器是一个可调用对象，用于在记录日志前进行自定义过滤。
-     * 过滤器接收三个参数：Level $level, string $message, array $context
-     * 返回 true 表示允许记录，false 表示拒绝记录。
+     * Filter is a callable object used for custom filtering before logging.
+     * Filter receives three parameters: Level $level, string $message, array $context
+     * Returns true to allow logging, false to reject logging.
      *
-     * @param callable(Level, string, array): bool $callback 过滤器回调函数
+     * @param callable(Level, string, array): bool $callback Filter callback function
      *
-     * @throws InvalidArgumentException 当回调不可调用时抛出异常
+     * @throws InvalidArgumentException When callback is not callable
      *
-     * @return self 返回当前实例以支持链式调用
+     * @return self Returns current instance to support method chaining
      */
     public function pushFilter(mixed $callback): self
     {
@@ -173,11 +173,11 @@ class Logger extends MonoLogger
     }
 
     /**
-     * 弹出并获取第一个注册的过滤器.
+     * Pop and get the first registered filter.
      *
-     * @throws LogicException 当过滤器栈为空时抛出异常
+     * @throws LogicException When filter stack is empty
      *
-     * @return callable 过滤器回调函数
+     * @return callable Filter callback function
      */
     public function popFilter(): callable
     {
