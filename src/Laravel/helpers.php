@@ -212,7 +212,7 @@ if (!function_exists('mlog_exception')) {
             }
 
             return $logger->log($level, $exception->getMessage(), $context);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return false;
         }
     }

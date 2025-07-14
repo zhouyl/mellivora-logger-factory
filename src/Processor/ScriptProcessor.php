@@ -8,17 +8,18 @@ use Monolog\Level;
 use Monolog\LogRecord;
 
 /**
- * 脚本进程信息处理器.
+ * Script Process Information Processor.
  *
- * 用于获取当前命令行进程的详细信息，包括进程ID、脚本路径和完整命令。
- * 仅在 CLI 模式下工作，会在日志的 extra 字段中添加进程相关信息。
+ * Used to get detailed information about the current command line process,
+ * including process ID, script path, and full command.
+ * Only works in CLI mode, adds process-related information to the log's extra field.
  */
 class ScriptProcessor
 {
     /**
-     * 构造函数.
+     * Constructor.
      *
-     * @param Level $level 最低处理级别，低于此级别的日志不会被处理
+     * @param Level $level Minimum processing level, logs below this level will not be processed
      */
     public function __construct(
         protected readonly Level $level = Level::Debug,
@@ -26,11 +27,11 @@ class ScriptProcessor
     }
 
     /**
-     * 处理日志记录，添加脚本进程信息.
+     * Process log record, adding script process information.
      *
-     * @param LogRecord $record 日志记录对象
+     * @param LogRecord $record Log record object
      *
-     * @return LogRecord 处理后的日志记录对象
+     * @return LogRecord Processed log record object
      */
     public function __invoke(LogRecord $record): LogRecord
     {
@@ -50,14 +51,14 @@ class ScriptProcessor
         if (function_exists('shell_exec') && $pid !== false) {
             /**
              * @codeCoverageIgnoreStart
-             * 获取脚本可执行文件路径
+             * Get script executable file path
              */
             $scriptPath = shell_exec("readlink /proc/$pid/exe 2>/dev/null");
             if ($scriptPath !== null) {
                 $record->extra['script'] = trim($scriptPath);
             }
 
-            // 获取完整的命令行
+            // Get full command line
             $command = shell_exec(
                 "ps -eo pid,cmd | grep $pid | grep -v grep | " .
                 "awk 'sub(\$1,\"\")' 2>/dev/null",

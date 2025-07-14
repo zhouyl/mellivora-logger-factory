@@ -8,24 +8,24 @@ use Monolog\Level;
 use Monolog\LogRecord;
 
 /**
- * 时间成本处理器.
+ * Cost Time Processor.
  *
- * 用于计算和记录日志记录之间的时间间隔，帮助分析程序性能。
- * 会在日志的 extra 字段中添加 'cost' 信息，表示距离上次记录的时间消耗（秒）。
+ * Used to calculate and record time intervals between log records, helping analyze program performance.
+ * Adds 'cost' information to the log's extra field, representing the time consumed since the last record (seconds).
  */
 class CostTimeProcessor
 {
     /**
-     * 时间点记录数组，按通道名称存储.
+     * Time point record array, stored by channel name.
      *
      * @var array<string, array{time: float, hash: string, cost: float}>
      */
     protected static array $points = [];
 
     /**
-     * 构造函数.
+     * Constructor.
      *
-     * @param Level $level 最低处理级别，低于此级别的日志不会被处理
+     * @param Level $level Minimum processing level, logs below this level will not be processed
      */
     public function __construct(
         protected readonly Level $level = Level::Debug,
@@ -33,11 +33,11 @@ class CostTimeProcessor
     }
 
     /**
-     * 处理日志记录，添加时间成本信息.
+     * Process log record, adding time cost information.
      *
-     * @param LogRecord $record 日志记录对象
+     * @param LogRecord $record Log record object
      *
-     * @return LogRecord 处理后的日志记录对象
+     * @return LogRecord Processed log record object
      */
     public function __invoke(LogRecord $record): LogRecord
     {
@@ -56,8 +56,8 @@ class CostTimeProcessor
                 'cost' => 0.0,
             ];
         } elseif ($hash !== self::$points[$name]['hash']) {
-            // 只有当记录内容发生变化时才更新时间成本
-            // 这样可以避免多个 Handler 同时处理同一条记录时的重复计算
+            // Only update time cost when record content changes
+            // This avoids duplicate calculations when multiple Handlers process the same record simultaneously
             self::$points[$name] = [
                 'time' => $current,
                 'hash' => $hash,

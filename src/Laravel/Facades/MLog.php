@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mellivora\Logger\Laravel\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Mellivora\Logger\Logger;
 use Mellivora\Logger\LoggerFactory;
 use Monolog\Level;
 use Psr\Log\LoggerInterface;
@@ -170,7 +171,7 @@ class MLog extends Facade
     ): bool {
         $logger = static::getFacadeRoot()->get($channel);
 
-        if ($logger instanceof \Mellivora\Logger\Logger) {
+        if ($logger instanceof Logger) {
             return $logger->addException($exception, $level);
         }
 

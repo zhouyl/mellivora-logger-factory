@@ -55,9 +55,9 @@ class Logger extends MonoLogger
     }
 
     /**
-     * 将 Logger 转换为字符串表示.
+     * Convert Logger to string representation.
      *
-     * @return string Logger 的字符串表示
+     * @return string String representation of Logger
      */
     public function __toString(): string
     {
@@ -65,15 +65,15 @@ class Logger extends MonoLogger
     }
 
     /**
-     * 设置当前 Logger 的日志级别.
+     * Set the current Logger's log level.
      *
-     * 低于此级别的日志将不会被传递到 Handler 进行处理
+     * Logs below this level will not be passed to Handler for processing
      *
-     * @param int|Level|string $level 日志级别，支持 Level 枚举、级别名称字符串或级别数值
+     * @param int|Level|string $level Log level, supports Level enum, level name string or level numeric value
      *
-     * @throws InvalidArgumentException 当级别类型无效时抛出异常
+     * @throws InvalidArgumentException When level type is invalid
      *
-     * @return self 返回当前实例以支持链式调用
+     * @return self Returns current instance to support method chaining
      */
     public function setLevel(mixed $level): self
     {
@@ -88,9 +88,9 @@ class Logger extends MonoLogger
     }
 
     /**
-     * 获取当前 Logger 的日志级别.
+     * Get the current Logger's log level.
      *
-     * @return Level 当前设置的日志级别
+     * @return Level Currently set log level
      */
     public function getLevel(): Level
     {
@@ -98,13 +98,13 @@ class Logger extends MonoLogger
     }
 
     /**
-     * 根据类名获取 Handler 实例.
+     * Get Handler instance by class name.
      *
-     * 如果有多个相同类型的 Handler，将返回第一个匹配的实例
+     * If there are multiple Handlers of the same type, the first matching instance will be returned
      *
-     * @param string $class Handler 类名（支持完整类名或类名）
+     * @param string $class Handler class name (supports full class name or class name)
      *
-     * @return mixed 匹配的 Handler 实例，未找到时返回 false
+     * @return mixed Matching Handler instance, returns false if not found
      *
      * @example $logger->getHandler(FileHandler::class)
      */
@@ -120,13 +120,13 @@ class Logger extends MonoLogger
     }
 
     /**
-     * 根据类名移除 Handler.
+     * Remove Handler by class name.
      *
-     * 如果有多个相同类型的 Handler，将全部被移除
+     * If there are multiple Handlers of the same type, all will be removed
      *
-     * @param string $class Handler 类名
+     * @param string $class Handler class name
      *
-     * @return bool 成功移除返回 true，未找到返回 false
+     * @return bool Returns true if successfully removed, false if not found
      *
      * @example $logger->removeHandler(FileHandler::class)
      */
@@ -136,9 +136,9 @@ class Logger extends MonoLogger
         foreach ($this->handlers as $key => $handler) {
             if (is_a($handler, $class)) {
                 unset($this->handlers[$key]);
-                $this->handlers = array_values($this->handlers); // 重新索引
+                $this->handlers = array_values($this->handlers); // Re-index
                 $removed = true;
-                break; // 只移除第一个匹配的
+                break; // Only remove the first match
             }
         }
 

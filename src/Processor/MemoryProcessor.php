@@ -8,19 +8,19 @@ use Monolog\Level;
 use Monolog\LogRecord;
 
 /**
- * 内存使用处理器.
+ * Memory Usage Processor.
  *
- * 用于记录当前内存使用情况，会在日志的 extra 字段中添加 'memory' 信息。
- * 支持格式化输出和真实内存使用量统计。
+ * Used to record current memory usage, adds 'memory' information to the log's extra field.
+ * Supports formatted output and real memory usage statistics.
  */
 class MemoryProcessor
 {
     /**
-     * 构造函数.
+     * Constructor.
      *
-     * @param Level $level 最低处理级别，低于此级别的日志不会被处理
-     * @param bool $realUsage 是否获取真实内存使用量（包括系统分配但未使用的内存）
-     * @param bool $useFormatting 是否格式化内存大小显示（如 1.5MB）
+     * @param Level $level Minimum processing level, logs below this level will not be processed
+     * @param bool $realUsage Whether to get real memory usage (including system allocated but unused memory)
+     * @param bool $useFormatting Whether to format memory size display (e.g., 1.5MB)
      */
     public function __construct(
         protected readonly Level $level = Level::Debug,
@@ -30,11 +30,11 @@ class MemoryProcessor
     }
 
     /**
-     * 处理日志记录，添加内存使用信息.
+     * Process log record, adding memory usage information.
      *
-     * @param LogRecord $record 日志记录对象
+     * @param LogRecord $record Log record object
      *
-     * @return LogRecord 处理后的日志记录对象
+     * @return LogRecord Processed log record object
      */
     public function __invoke(LogRecord $record): LogRecord
     {
@@ -51,11 +51,11 @@ class MemoryProcessor
     }
 
     /**
-     * 格式化字节数为可读的字符串.
+     * Format bytes to readable string.
      *
-     * @param float|int $bytes 字节数
+     * @param float|int $bytes Number of bytes
      *
-     * @return int|string 格式化后的字符串（如 "1.5 MB"）或原始字节数
+     * @return int|string Formatted string (e.g., "1.5 MB") or raw byte count
      */
     protected function formatBytes(int|float $bytes): string|int
     {

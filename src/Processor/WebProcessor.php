@@ -8,15 +8,16 @@ use Monolog\Level;
 use Monolog\LogRecord;
 
 /**
- * Web 请求信息处理器.
+ * Web Request Information Processor.
  *
- * 用于获取当前 HTTP 请求的详细信息，包括请求头、请求方法、客户端IP等。
- * 仅在 Web 环境下工作，会在日志的 extra 字段中添加请求相关信息。
+ * Used to get detailed information about the current HTTP request,
+ * including request headers, request method, client IP, etc.
+ * Only works in web environment, adds request-related information to the log's extra field.
  */
 class WebProcessor
 {
     /**
-     * 默认要收集的服务器变量键名.
+     * Default server variable keys to collect.
      */
     private const DEFAULT_SERVER_KEYS = [
         'HTTP_USER_AGENT',
@@ -28,12 +29,12 @@ class WebProcessor
     ];
 
     /**
-     * 构造函数.
+     * Constructor.
      *
-     * @param Level $level 最低处理级别，低于此级别的日志不会被处理
-     * @param array<string> $serverKeys 要收集的服务器变量键名数组
-     * @param array<string, mixed> $serverData 自定义服务器数据，为空时使用 $_SERVER
-     * @param array<string, mixed> $postData 自定义 POST 数据，为空时使用 $_POST
+     * @param Level $level Minimum processing level, logs below this level will not be processed
+     * @param array<string> $serverKeys Array of server variable keys to collect
+     * @param array<string, mixed> $serverData Custom server data, uses $_SERVER when empty
+     * @param array<string, mixed> $postData Custom POST data, uses $_POST when empty
      */
     public function __construct(
         protected readonly Level $level = Level::Debug,
@@ -44,11 +45,11 @@ class WebProcessor
     }
 
     /**
-     * 处理日志记录，添加 Web 请求信息.
+     * Process log record, adding web request information.
      *
-     * @param LogRecord $record 日志记录对象
+     * @param LogRecord $record Log record object
      *
-     * @return LogRecord 处理后的日志记录对象
+     * @return LogRecord Processed log record object
      */
     public function __invoke(LogRecord $record): LogRecord
     {
@@ -78,9 +79,9 @@ class WebProcessor
     }
 
     /**
-     * 获取服务器数据.
+     * Get server data.
      *
-     * @return array<string, mixed> 服务器数据数组
+     * @return array<string, mixed> Server data array
      */
     private function getServerData(): array
     {
@@ -88,9 +89,9 @@ class WebProcessor
     }
 
     /**
-     * 获取 POST 数据.
+     * Get POST data.
      *
-     * @return array<string, mixed> POST 数据数组
+     * @return array<string, mixed> POST data array
      */
     private function getPostData(): array
     {

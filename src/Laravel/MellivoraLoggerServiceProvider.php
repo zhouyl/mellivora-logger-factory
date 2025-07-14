@@ -12,21 +12,21 @@ use Psr\Log\LoggerInterface;
 /**
  * Mellivora Logger Service Provider for Laravel.
  *
- * 提供 Laravel 框架集成支持，包括：
- * - 自动配置加载
- * - 单例服务注册
- * - 配置发布
- * - 便捷函数注册
+ * Provides Laravel framework integration support, including:
+ * - Automatic configuration loading
+ * - Singleton service registration
+ * - Configuration publishing
+ * - Helper function registration
  */
 class MellivoraLoggerServiceProvider extends ServiceProvider
 {
     /**
-     * 是否延迟加载服务提供者.
+     * Whether to defer loading the service provider.
      */
     protected bool $defer = false;
 
     /**
-     * 注册服务
+     * Register services.
      */
     public function register(): void
     {
@@ -40,7 +40,7 @@ class MellivoraLoggerServiceProvider extends ServiceProvider
     }
 
     /**
-     * 启动服务
+     * Boot services.
      */
     public function boot(): void
     {
@@ -52,7 +52,7 @@ class MellivoraLoggerServiceProvider extends ServiceProvider
     }
 
     /**
-     * 获取服务提供者提供的服务
+     * Get the services provided by the service provider.
      *
      * @return array<string>
      */
@@ -67,14 +67,14 @@ class MellivoraLoggerServiceProvider extends ServiceProvider
     }
 
     /**
-     * 注册 LoggerFactory 服务
+     * Register LoggerFactory service.
      */
     protected function registerLoggerFactory(): void
     {
         $this->app->singleton(LoggerFactory::class, function (Application $app): LoggerFactory {
             $config = $app['config']['mellivora-logger'] ?? [];
 
-            // 设置项目根目录
+            // Set project root directory
             LoggerFactory::setRootPath(base_path());
 
             return LoggerFactory::build($config);
@@ -84,16 +84,16 @@ class MellivoraLoggerServiceProvider extends ServiceProvider
     }
 
     /**
-     * 注册 Logger 别名.
+     * Register Logger aliases.
      */
     protected function registerLoggerAliases(): void
     {
-        // 注册默认 Logger
+        // Register default Logger
         $this->app->bind('mellivora.logger', function (Application $app): LoggerInterface {
             return $app[LoggerFactory::class]->get();
         });
 
-        // 注册命名 Logger 工厂方法
+        // Register named Logger factory method
         $this->app->bind('mellivora.logger.channel', function (Application $app) {
             return function (string $channel): LoggerInterface {
                 return $app[LoggerFactory::class]->get($channel);
@@ -102,7 +102,7 @@ class MellivoraLoggerServiceProvider extends ServiceProvider
     }
 
     /**
-     * 加载辅助函数.
+     * Load helper functions.
      */
     protected function loadHelpers(): void
     {

@@ -34,7 +34,7 @@ use UnexpectedValueException;
 class NamedRotatingFileHandler extends StreamHandler
 {
     /**
-     * Log file name template
+     * Log file name template.
      */
     protected string $filename;
 

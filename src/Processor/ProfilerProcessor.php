@@ -9,24 +9,24 @@ use Monolog\LogRecord;
 use Monolog\Processor\MemoryProcessor as MonologMemoryProcessor;
 
 /**
- * 性能分析处理器.
+ * Performance Profiler Processor.
  *
- * 综合性能分析处理器，结合了时间成本和内存使用情况的统计。
- * 会在日志的 extra 字段中添加 'cost'、'memory_usage' 和 'memory_peak_usage' 信息。
+ * Comprehensive performance analysis processor that combines time cost and memory usage statistics.
+ * Adds 'cost', 'memory_usage', and 'memory_peak_usage' information to the log's extra field.
  */
 class ProfilerProcessor extends MonologMemoryProcessor
 {
     /**
-     * 时间点记录数组，按通道名称存储.
+     * Time point record array, stored by channel name.
      *
      * @var array<string, array{time: float, hash: string, cost: float}>
      */
     protected static array $points = [];
 
     /**
-     * 构造函数.
+     * Constructor.
      *
-     * @param Level $level 最低处理级别，低于此级别的日志不会被处理
+     * @param Level $level Minimum processing level, logs below this level will not be processed
      */
     public function __construct(
         protected readonly Level $level = Level::Debug,
@@ -35,11 +35,11 @@ class ProfilerProcessor extends MonologMemoryProcessor
     }
 
     /**
-     * 处理日志记录，添加性能分析信息.
+     * Process log record, adding performance analysis information.
      *
-     * @param LogRecord $record 日志记录对象
+     * @param LogRecord $record Log record object
      *
-     * @return LogRecord 处理后的日志记录对象
+     * @return LogRecord Processed log record object
      */
     public function __invoke(LogRecord $record): LogRecord
     {
@@ -47,7 +47,7 @@ class ProfilerProcessor extends MonologMemoryProcessor
             return $record;
         }
 
-        // 计算时间成本
+        // Calculate time cost
         $name = $record->channel;
         $hash = md5(serialize($record->toArray()));
         $current = microtime(true);
@@ -59,7 +59,7 @@ class ProfilerProcessor extends MonologMemoryProcessor
                 'cost' => 0.0,
             ];
         } elseif ($hash !== self::$points[$name]['hash']) {
-            // 只有当记录内容发生变化时才更新时间成本
+            // Only update time cost when record content changes
             self::$points[$name] = [
                 'time' => $current,
                 'hash' => $hash,
@@ -67,7 +67,7 @@ class ProfilerProcessor extends MonologMemoryProcessor
             ];
         }
 
-        // 添加性能信息
+        // Add performance information
         $record->extra['cost'] = self::$points[$name]['cost'];
         $record->extra['memory_usage'] = $this->formatBytes(memory_get_usage(true));
         $record->extra['memory_peak_usage'] = $this->formatBytes(memory_get_peak_usage(true));

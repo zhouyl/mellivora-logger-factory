@@ -4,60 +4,61 @@ declare(strict_types=1);
 
 namespace Mellivora\Logger\Laravel\Middleware;
 
+use Closure;
 use Illuminate\Http\Request;
 use Mellivora\Logger\Laravel\Facades\MLog;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
- * 请求日志中间件.
+ * Request Logging Middleware.
  *
- * 自动记录 HTTP 请求和响应的详细信息
+ * Automatically logs detailed information about HTTP requests and responses
  */
 class LogRequestMiddleware
 {
     /**
-     * 处理传入的请求
+     * Handle incoming request.
      *
-     * @param Request $request HTTP 请求对象
-     * @param \Closure $next 下一个中间件
-     * @param null|string $channel 日志通道名称
-     * @param null|string $level 日志级别
+     * @param Request $request HTTP request object
+     * @param Closure $next Next middleware
+     * @param null|string $channel Log channel name
+     * @param null|string $level Log level
      *
-     * @return SymfonyResponse HTTP 响应对象
+     * @return SymfonyResponse HTTP response object
      */
     public function handle(
         Request $request,
-        \Closure $next,
+        Closure $next,
         ?string $channel = null,
         ?string $level = 'info',
     ): SymfonyResponse {
         $startTime = microtime(true);
         $startMemory = memory_get_usage(true);
 
-        // 记录请求开始
+        // Log request start
         $this->logRequest($request, $channel, $level);
 
-        // 处理请求
+        // Process request
         $response = $next($request);
 
-        // 计算处理时间和内存使用
+        // Calculate processing time and memory usage
         $endTime = microtime(true);
         $endMemory = memory_get_usage(true);
-        $duration = round(($endTime - $startTime) * 1000, 2); // 毫秒
+        $duration = round(($endTime - $startTime) * 1000, 2); // milliseconds
         $memoryUsed = $endMemory - $startMemory;
 
-        // 记录响应
+        // Log response
         $this->logResponse($request, $response, $duration, $memoryUsed, $channel, $level);
 
         return $response;
     }
 
     /**
-     * 记录请求信息.
+     * Log request information.
      *
-     * @param Request $request HTTP 请求对象
-     * @param null|string $channel 日志通道名称
-     * @param string $level 日志级别
+     * @param Request $request HTTP request object
+     * @param null|string $channel Log channel name
+     * @param string $level Log level
      */
     protected function logRequest(Request $request, ?string $channel, string $level): void
     {
@@ -80,14 +81,14 @@ class LogRequestMiddleware
     }
 
     /**
-     * 记录响应信息.
+     * Log response information.
      *
-     * @param Request $request HTTP 请求对象
-     * @param SymfonyResponse $response HTTP 响应对象
-     * @param float $duration 处理时间（毫秒）
-     * @param int $memoryUsed 内存使用量（字节）
-     * @param null|string $channel 日志通道名称
-     * @param string $level 日志级别
+     * @param Request $request HTTP request object
+     * @param SymfonyResponse $response HTTP response object
+     * @param float $duration Processing time (milliseconds)
+     * @param int $memoryUsed Memory usage (bytes)
+     * @param null|string $channel Log channel name
+     * @param string $level Log level
      */
     protected function logResponse(
         Request $request,

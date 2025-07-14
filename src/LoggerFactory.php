@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Mellivora\Logger;
 
+use ArrayAccess;
+use InvalidArgumentException;
 use Monolog\Handler\NullHandler;
 use Monolog\Level;
-use Psr\Log\InvalidArgumentException;
+use Psr\Log\InvalidArgumentException as PsrInvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use ReflectionClass;
 use RuntimeException;
 use UnhandledMatchError;
 use ValueError;
@@ -19,7 +22,7 @@ use ValueError;
  * of Handlers, Formatters, and Processors. Implements ArrayAccess interface for array-like
  * access to Logger instances.
  */
-class LoggerFactory implements \ArrayAccess
+class LoggerFactory implements ArrayAccess
 {
     /**
      * 项目根目录路径，用于辅助日志文件定位.
@@ -50,9 +53,9 @@ class LoggerFactory implements \ArrayAccess
     protected array $processors = [];
 
     /**
-     * Handler 配置数组.
+     * Handler configuration array.
      *
-     * 格式: ['handler_name' => [
+     * Format: ['handler_name' => [
      *     'class' => 'ClassName',
      *     'params' => [...],
      *     'formatter' => 'formatter_name',
@@ -69,30 +72,30 @@ class LoggerFactory implements \ArrayAccess
     protected array $handlers = [];
 
     /**
-     * Logger 通道配置数组.
+     * Logger channel configuration array.
      *
-     * 格式: ['logger_name' => ['handler1', 'handler2', ...]]
+     * Format: ['logger_name' => ['handler1', 'handler2', ...]]
      *
      * @var array<string, array<string>>
      */
     protected array $loggers = [];
 
     /**
-     * 已实例化的 Logger 实例缓存.
+     * Cache of instantiated Logger instances.
      *
      * @var array<string, LoggerInterface>
      */
     protected array $instances = [];
 
     /**
-     * 构造函数.
+     * Constructor.
      *
-     * @param array $config 日志配置数组，支持以下键：
-     *                      - formatters: Formatter 配置
-     *                      - processors: Processor 配置
-     *                      - handlers: Handler 配置
-     *                      - loggers: Logger 通道配置
-     *                      - default: 默认 Logger 通道名称
+     * @param array $config Log configuration array, supports the following keys:
+     *                      - formatters: Formatter configuration
+     *                      - processors: Processor configuration
+     *                      - handlers: Handler configuration
+     *                      - loggers: Logger channel configuration
+     *                      - default: Default Logger channel name
      */
     public function __construct(array $config = [])
     {
@@ -111,7 +114,7 @@ class LoggerFactory implements \ArrayAccess
      *
      * @param string $path 项目根目录路径
      *
-     * @throws \InvalidArgumentException 当路径无效时抛出异常
+     * @throws InvalidArgumentException 当路径无效时抛出异常
      */
     public static function setRootPath(string $path): void
     {
@@ -162,7 +165,7 @@ class LoggerFactory implements \ArrayAccess
      *
      * @param string $configFile PHP 配置文件路径，必须是 .php 文件
      *
-     * @throws \InvalidArgumentException 当配置文件不存在、格式不正确或内容无效时抛出异常
+     * @throws InvalidArgumentException 当配置文件不存在、格式不正确或内容无效时抛出异常
      *
      * @return self LoggerFactory 实例
      */
@@ -173,7 +176,7 @@ class LoggerFactory implements \ArrayAccess
         }
 
         if (!str_ends_with($configFile, '.php')) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "Only PHP configuration files are supported: {$configFile}",
             );
         }
@@ -181,7 +184,7 @@ class LoggerFactory implements \ArrayAccess
         $config = require $configFile;
 
         if (!is_array($config)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "Configuration file must return an array: {$configFile}",
             );
         }
@@ -400,7 +403,7 @@ class LoggerFactory implements \ArrayAccess
      *                                                     - class: 完整的类名（包含命名空间）
      *                                                     - params: 构造函数参数数组，支持按名称或位置传递
      *
-     * @throws \InvalidArgumentException 当缺少 class 参数时抛出异常
+     * @throws InvalidArgumentException 当缺少 class 参数时抛出异常
      * @throws RuntimeException 当类不存在时抛出异常
      *
      * @return object 创建的类实例
@@ -417,7 +420,7 @@ class LoggerFactory implements \ArrayAccess
     protected function newInstanceWithOption(array $option): object
     {
         if (empty($option['class'])) {
-            throw new \InvalidArgumentException("Missing the 'class' parameter");
+            throw new InvalidArgumentException("Missing the 'class' parameter");
         }
 
         $class = $option['class'];
@@ -429,7 +432,7 @@ class LoggerFactory implements \ArrayAccess
             return new $class();
         }
 
-        $ref = new \ReflectionClass($class);
+        $ref = new ReflectionClass($class);
         $constructor = $ref->getConstructor();
 
         if ($constructor === null) {
@@ -457,7 +460,7 @@ class LoggerFactory implements \ArrayAccess
             if ($paramName === 'level' && is_string($value)) {
                 try {
                     $value = Level::fromName($value);
-                } catch (InvalidArgumentException|ValueError|UnhandledMatchError) {
+                } catch (PsrInvalidArgumentException|ValueError|UnhandledMatchError) {
                     // 如果转换失败，保持原值
                 }
             }

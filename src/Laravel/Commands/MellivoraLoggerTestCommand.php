@@ -7,29 +7,31 @@ namespace Mellivora\Logger\Laravel\Commands;
 use Illuminate\Console\Command;
 use Mellivora\Logger\Laravel\Facades\MLog;
 use Monolog\Level;
+use RuntimeException;
+use Throwable;
 
 /**
- * Mellivora Logger 测试命令.
+ * Mellivora Logger Test Command.
  *
- * 用于测试 Mellivora Logger 的各种功能
+ * Used to test various functionalities of Mellivora Logger
  */
 class MellivoraLoggerTestCommand extends Command
 {
     /**
-     * 命令签名.
+     * Command signature.
      */
     protected $signature = 'mellivora:log-test
-                            {--channel= : 指定日志通道}
-                            {--level=info : 指定日志级别}
-                            {--message=Test message : 指定日志消息}';
+                            {--channel= : Specify log channel}
+                            {--level=info : Specify log level}
+                            {--message=Test message : Specify log message}';
 
     /**
-     * 命令描述.
+     * Command description.
      */
     protected $description = 'Test Mellivora Logger functionality';
 
     /**
-     * 执行命令.
+     * Execute command.
      */
     public function handle(): int
     {
@@ -73,7 +75,7 @@ class MellivoraLoggerTestCommand extends Command
                 MellivoraLogger::log($level, $message, ['test' => 'basic']);
                 $this->line("   ✓ Logged to default channel with level '{$level}'");
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->error("   ✗ Failed: {$e->getMessage()}");
         }
     }
@@ -97,7 +99,7 @@ class MellivoraLoggerTestCommand extends Command
             try {
                 MellivoraLogger::$level($message, ['level_test' => true], $channel);
                 $this->line("   ✓ {$level}: {$message}");
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->error("   ✗ {$level} failed: {$e->getMessage()}");
             }
         }
@@ -111,10 +113,10 @@ class MellivoraLoggerTestCommand extends Command
         $this->info('3. Testing exception logging...');
 
         try {
-            $exception = new \RuntimeException('Test exception for logging', 12345);
+            $exception = new RuntimeException('Test exception for logging', 12345);
             MLog::exception($exception, Level::Error, $channel);
             $this->line('   ✓ Exception logged successfully');
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->error("   ✗ Exception logging failed: {$e->getMessage()}");
         }
     }
@@ -136,7 +138,7 @@ class MellivoraLoggerTestCommand extends Command
                     $channel,
                 );
                 $this->line("   ✓ {$channel} channel");
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->error("   ✗ {$channel} channel failed: {$e->getMessage()}");
             }
         }

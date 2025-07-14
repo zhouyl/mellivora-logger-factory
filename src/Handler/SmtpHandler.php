@@ -57,7 +57,7 @@ class SmtpHandler extends AbstractProcessingHandler
     ];
 
     /**
-     * Sender email address
+     * Sender email address.
      */
     protected string $sender;
 
