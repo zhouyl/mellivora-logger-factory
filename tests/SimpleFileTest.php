@@ -57,13 +57,13 @@ class SimpleFileTest extends TestCase
                         'filename' => $this->tempDir . '/factory_test.log',
                         'maxBytes' => 1024,
                         'backupCount' => 3,
-                        'bufferSize' => 1
-                    ]
-                ]
+                        'bufferSize' => 1,
+                    ],
+                ],
             ],
             'loggers' => [
-                'test' => ['file']
-            ]
+                'test' => ['file'],
+            ],
         ];
 
         $factory = new LoggerFactory($config);
@@ -97,7 +97,7 @@ class SimpleFileTest extends TestCase
             level: Level::Info,
             message: 'Test message',
             context: [],
-            extra: []
+            extra: [],
         );
 
         $this->assertTrue($handler->isHandling($record));
@@ -108,7 +108,7 @@ class SimpleFileTest extends TestCase
             level: Level::Debug,
             message: 'Debug message',
             context: [],
-            extra: []
+            extra: [],
         );
 
         $this->assertFalse($handler->isHandling($debugRecord));
@@ -125,7 +125,7 @@ class SimpleFileTest extends TestCase
             level: Level::Info,
             message: 'First message',
             context: [],
-            extra: []
+            extra: [],
         );
 
         $record2 = new LogRecord(
@@ -134,7 +134,7 @@ class SimpleFileTest extends TestCase
             level: Level::Info,
             message: 'Second message',
             context: [],
-            extra: []
+            extra: [],
         );
 
         // Handle records

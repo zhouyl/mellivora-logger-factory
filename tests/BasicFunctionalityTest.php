@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Basic functionality tests that should always pass.
- * 
+ *
  * These tests focus on core functionality without complex file operations
  * that might fail due to buffering or timing issues.
  */
@@ -36,7 +36,7 @@ class BasicFunctionalityTest extends TestCase
     {
         $filename = $this->tempDir . '/test_%date%_%channel%.log';
         $handler = new NamedRotatingFileHandler($filename, 1024, 3, 0);
-        
+
         $this->assertInstanceOf(NamedRotatingFileHandler::class, $handler);
     }
 
@@ -44,9 +44,9 @@ class BasicFunctionalityTest extends TestCase
     {
         $filename = $this->tempDir . '/test_%date%_%channel%.log';
         $handler = new NamedRotatingFileHandler($filename, 1024, 3, 0);
-        
+
         $actualFilename = $handler->getFilename('test');
-        
+
         $this->assertStringContainsString('test', $actualFilename);
         $this->assertStringContainsString(date('Y-m-d'), $actualFilename);
         $this->assertStringContainsString($this->tempDir, $actualFilename);
@@ -56,19 +56,19 @@ class BasicFunctionalityTest extends TestCase
     {
         $filename = $this->tempDir . '/handler_test_%date%_%channel%.log';
         $handler = new NamedRotatingFileHandler($filename, 1024, 3, 0);
-        
+
         $record = new LogRecord(
             datetime: new \DateTimeImmutable(),
             channel: 'test',
             level: Level::Info,
             message: 'Test message',
             context: [],
-            extra: []
+            extra: [],
         );
-        
+
         // Test that handler can process the record without throwing exceptions
         $handler->handle($record);
-        
+
         // If we get here, the handler processed the record successfully
         $this->assertTrue(true);
     }
@@ -83,23 +83,23 @@ class BasicFunctionalityTest extends TestCase
                         'filename' => $this->tempDir . '/factory_%date%_%channel%.log',
                         'maxBytes' => 1024,
                         'backupCount' => 3,
-                        'bufferSize' => 0
-                    ]
-                ]
+                        'bufferSize' => 0,
+                    ],
+                ],
             ],
             'loggers' => [
-                'test' => ['test_handler']
-            ]
+                'test' => ['test_handler'],
+            ],
         ];
-        
+
         $factory = new LoggerFactory($config);
         $logger = $factory->get('test');
-        
+
         $this->assertNotNull($logger);
-        
+
         // Test basic logging
         $logger->info('Factory test message');
-        
+
         // If we get here without exception, the test passes
         $this->assertTrue(true);
     }
@@ -114,32 +114,32 @@ class BasicFunctionalityTest extends TestCase
                         'filename' => $this->tempDir . '/multi_%date%_%channel%.log',
                         'maxBytes' => 1024,
                         'backupCount' => 3,
-                        'bufferSize' => 0
-                    ]
-                ]
+                        'bufferSize' => 0,
+                    ],
+                ],
             ],
             'loggers' => [
                 'app' => ['file_handler'],
                 'api' => ['file_handler'],
-                'debug' => ['file_handler']
-            ]
+                'debug' => ['file_handler'],
+            ],
         ];
-        
+
         $factory = new LoggerFactory($config);
-        
+
         $appLogger = $factory->get('app');
         $apiLogger = $factory->get('api');
         $debugLogger = $factory->get('debug');
-        
+
         $this->assertNotNull($appLogger);
         $this->assertNotNull($apiLogger);
         $this->assertNotNull($debugLogger);
-        
+
         // Test that different loggers work
         $appLogger->info('App message');
         $apiLogger->debug('API message');
         $debugLogger->warning('Debug message');
-        
+
         $this->assertTrue(true);
     }
 
@@ -147,7 +147,7 @@ class BasicFunctionalityTest extends TestCase
     {
         $filename = $this->tempDir . '/levels_%date%_%channel%.log';
         $handler = new NamedRotatingFileHandler($filename, 1024, 3, 0);
-        
+
         $levels = [
             Level::Debug,
             Level::Info,
@@ -156,9 +156,9 @@ class BasicFunctionalityTest extends TestCase
             Level::Error,
             Level::Critical,
             Level::Alert,
-            Level::Emergency
+            Level::Emergency,
         ];
-        
+
         foreach ($levels as $level) {
             $record = new LogRecord(
                 datetime: new \DateTimeImmutable(),
@@ -166,12 +166,12 @@ class BasicFunctionalityTest extends TestCase
                 level: $level,
                 message: "Test message for level {$level->name}",
                 context: [],
-                extra: []
+                extra: [],
             );
-            
+
             $handler->handle($record);
         }
-        
+
         // If we processed all levels without exception, test passes
         $this->assertTrue(true);
     }
@@ -180,7 +180,7 @@ class BasicFunctionalityTest extends TestCase
     {
         $filename = $this->tempDir . '/context_%date%_%channel%.log';
         $handler = new NamedRotatingFileHandler($filename, 1024, 3, 0);
-        
+
         $record = new LogRecord(
             datetime: new \DateTimeImmutable(),
             channel: 'test',
@@ -189,16 +189,16 @@ class BasicFunctionalityTest extends TestCase
             context: [
                 'user_id' => 123,
                 'action' => 'login',
-                'ip' => '192.168.1.1'
+                'ip' => '192.168.1.1',
             ],
             extra: [
                 'memory_usage' => memory_get_usage(),
-                'execution_time' => microtime(true)
-            ]
+                'execution_time' => microtime(true),
+            ],
         );
-        
+
         $handler->handle($record);
-        
+
         $this->assertTrue(true);
     }
 
@@ -206,10 +206,10 @@ class BasicFunctionalityTest extends TestCase
     {
         $nestedPath = $this->tempDir . '/nested/deep/path/test_%date%_%channel%.log';
         $handler = new NamedRotatingFileHandler($nestedPath, 1024, 3, 0);
-        
+
         // This should create the directory structure
         $actualFilename = $handler->getFilename('test');
-        
+
         // Check that the directory was created
         $this->assertDirectoryExists(dirname($actualFilename));
     }
@@ -218,25 +218,25 @@ class BasicFunctionalityTest extends TestCase
     {
         $filename = $this->tempDir . '/handling_%date%_%channel%.log';
         $handler = new NamedRotatingFileHandler($filename, 1024, 3, 0, 'Y-m-d', Level::Info);
-        
+
         $infoRecord = new LogRecord(
             datetime: new \DateTimeImmutable(),
             channel: 'test',
             level: Level::Info,
             message: 'Info message',
             context: [],
-            extra: []
+            extra: [],
         );
-        
+
         $debugRecord = new LogRecord(
             datetime: new \DateTimeImmutable(),
             channel: 'test',
             level: Level::Debug,
             message: 'Debug message',
             context: [],
-            extra: []
+            extra: [],
         );
-        
+
         $this->assertTrue($handler->isHandling($infoRecord));
         $this->assertFalse($handler->isHandling($debugRecord));
     }
