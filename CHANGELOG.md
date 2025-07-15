@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.3-alpha] - 2024-07-14
+
+### Added
+- **Comprehensive Test Suite**: Significantly expanded test coverage from 86.43% to 87.28%
+  - Added 193 total test cases (up from 144)
+  - Added 447 total assertions (up from 403)
+  - New file operations test suite
+  - Complete Laravel integration tests
+  - Error handling and edge case tests
+
+- **Laravel 12 Support**: Full compatibility with Laravel 12.x
+  - Updated composer dependencies to support Laravel 10.x, 11.x, and 12.x
+  - Added comprehensive Laravel integration testing
+  - Service Provider, Facade, Middleware, and Helper function tests
+  - Command testing with Symfony Console integration
+
+- **File Operations Testing**: Comprehensive file handling test coverage
+  - File creation and writing tests
+  - Directory permissions handling
+  - File rotation scenarios
+  - Concurrent file access testing
+  - Special characters and edge cases
+  - Large file handling tests
+
+### Enhanced
+- **Test Coverage**: Improved overall code coverage and reliability
+  - File operations: Complete coverage
+  - Laravel integration: Full test suite
+  - Error handling: Edge case coverage
+  - Performance testing: Large file scenarios
+  - Concurrency testing: Multi-threaded scenarios
+
+- **Dependencies**: Added Laravel 12 development dependencies
+  - illuminate/support: ^10.0|^11.0|^12.0
+  - illuminate/console: ^10.0|^11.0|^12.0
+  - illuminate/http: ^10.0|^11.0|^12.0
+  - illuminate/container: ^10.0|^11.0|^12.0
+  - illuminate/config: ^10.0|^11.0|^12.0
+  - phpoption/phpoption: ^1.9
+
+### Fixed
+- **File Handler**: Fixed directory creation logic in NamedRotatingFileHandler
+- **Test Infrastructure**: Improved test reliability and error handling
+- **Laravel Integration**: Enhanced compatibility with Laravel framework components
+
+### Technical Improvements
+- **Logs Directory**: Added logs directory with proper git ignore configuration
+- **Test Organization**: Better structured test files for different scenarios
+- **Error Handling**: More robust error handling in file operations
+- **Code Quality**: Maintained high code quality standards with expanded test coverage
+
 ## [2.0.2-alpha] - 2024-07-14
 
 ### Fixed
