@@ -12,6 +12,7 @@ use Monolog\Level;
 use Monolog\Logger as MonoLogger;
 use Throwable;
 use UnhandledMatchError;
+use ValueError;
 
 /**
  * Logger class extension - Custom Logger implementation based on Monolog.
@@ -222,7 +223,7 @@ class Logger extends MonoLogger
             return false;
         }
 
-        // 应用过滤器
+        // apply filters
         foreach ($this->filters as $filter) {
             if (!$filter($levelObj, $message, $context)) {
                 return false;
@@ -273,7 +274,7 @@ class Logger extends MonoLogger
     {
         try {
             return Level::fromName($level);
-        } catch (UnhandledMatchError|\ValueError $e) {
+        } catch (UnhandledMatchError|ValueError $e) {
             throw new InvalidArgumentException("Invalid level string: {$level}", 0, $e);
         }
     }

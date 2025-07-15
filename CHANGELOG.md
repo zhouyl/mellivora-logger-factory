@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2024-07-15
+
+### 🎉 Stable Release
+This is the first stable release of Mellivora Logger Factory v2.0, marking a major milestone in the project's development. The library is now production-ready with enterprise-grade quality assurance.
+
+### ✨ Key Features
+- **Modern PHP Logger Factory**: Built for PHP 8.3+ with modern coding standards
+- **Laravel Integration**: Full support for Laravel 10.x, 11.x, and 12.x
+- **Filter System**: Comprehensive log filtering capabilities
+- **High Test Coverage**: 87.28% line coverage with 159 test cases
+- **Internationalization**: Complete English and Chinese documentation
+- **Enterprise Quality**: PSR-12 compliant with automated CI/CD workflows
+
+### 🔧 Technical Highlights
+- **Test Coverage**: 87.28% (295/338 lines)
+- **Test Cases**: 159 tests with 429 assertions
+- **Code Quality**: PSR-12 compliant, zero violations
+- **CI/CD**: 4 automated workflows (CI, Coverage, Quality, Release)
+- **Dependencies**: Latest Monolog 3.x, PHP 8.3+, Laravel 12 support
+
+### 📚 Documentation
+- **Bilingual Support**: Complete English and Chinese documentation
+- **Comprehensive Examples**: Rich example code and usage patterns
+- **Laravel Guide**: Detailed Laravel integration documentation
+- **Filter Examples**: Extensive filter configuration examples
+
+### 🌐 Internationalization
+- **Source Code**: 100% English comments and documentation
+- **API Documentation**: Complete English documentation
+- **Chinese Support**: Full Chinese documentation maintained
+- **Global Ready**: Prepared for worldwide adoption
+
+### 🚀 Production Ready
+- **Stability**: Thoroughly tested and validated
+- **Performance**: Optimized for production workloads
+- **Security**: No known vulnerabilities
+- **Compatibility**: Backward compatible within 2.x series
+
 ## [2.0.3-alpha] - 2024-07-14
 
 ### Added

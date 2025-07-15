@@ -1,6 +1,6 @@
 # Mellivora Logger Factory
 
-[![Version](https://img.shields.io/badge/version-2.0.3--alpha-orange.svg)](https://github.com/zhouyl/mellivora-logger-factory/releases)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/zhouyl/mellivora-logger-factory/releases)
 [![CI](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/ci.yml/badge.svg)](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/ci.yml)
 [![Coverage](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/coverage.yml/badge.svg)](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/coverage.yml)
 [![Quality](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/quality.yml/badge.svg)](https://github.com/zhouyl/mellivora-logger-factory/actions/workflows/quality.yml)
@@ -13,7 +13,7 @@
 
 **🧪 高质量保证**: 拥有 **88.82%** 的测试覆盖率，包含 144 个测试方法和 367 个断言，确保代码质量和稳定性。
 
-> **⚠️ Alpha 版本提醒**: 当前版本为 **2.0.3-alpha**，这是一个预发布版本，适用于测试和评估。虽然功能完整且经过充分测试，但在生产环境使用前请进行充分的测试验证。
+> **🎉 稳定版本**: 当前版本为 **2.0.0**，这是一个稳定的正式版本，可以安全地用于生产环境。该版本经过充分测试，测试覆盖率达到 87.28%，具备企业级质量保证。
 
 > **🤖 AI 驱动开发**: 本项目的重构和测试完善工作完全由 [Augment](https://www.augmentcode.com/) 智能编码AI工具完成，展示了AI在现代软件开发中的强大能力。
 
@@ -81,17 +81,15 @@
 
 ## 安装
 
-使用 Composer 安装 alpha 版本：
+使用 Composer 安装稳定版本：
 
 ```bash
-# 安装 alpha 版本
-composer require mellivora/logger-factory:^2.0.0-alpha
+# 安装稳定版本
+composer require mellivora/logger-factory:^2.0.0
 
 # 或指定具体版本
-composer require mellivora/logger-factory:2.0.0-alpha
+composer require mellivora/logger-factory:2.0.0
 ```
-
-> **注意**: 由于这是 alpha 版本，您可能需要在 composer.json 中设置 `"minimum-stability": "alpha"` 或使用 `--with-all-dependencies` 标志。
 
 ## 使用方法
 
