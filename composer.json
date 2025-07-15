@@ -39,7 +39,8 @@
         "illuminate/http": "^10.0|^11.0|^12.0",
         "illuminate/container": "^10.0|^11.0|^12.0",
         "illuminate/config": "^10.0|^11.0|^12.0",
-        "phpoption/phpoption": "^1.9"
+        "phpoption/phpoption": "^1.9",
+        "vlucas/phpdotenv": "^5.4"
     },
     "autoload": {
         "psr-4": {
